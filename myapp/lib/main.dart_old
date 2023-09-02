@@ -1,0 +1,34 @@
+import 'package:flutter/material.dart';
+import 'camera_page.dart';
+import 'package:tflite_flutter/tflite_flutter.dart';
+
+void main() => runApp(MyApp());
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: HomePage(),
+    );
+  }
+}
+
+class HomePage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Camera Example')),
+      body: Center(
+        child: ElevatedButton(
+          child: Text('Open Camera'),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => CameraPage()),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}

@@ -1,0 +1,33 @@
+[36mThe plugin `tflite` uses a deprecated version of the Android embedding.[39m
+[36mTo avoid unexpected runtime failures, or future build failures, try to see if this plugin supports the Android V2[39m
+[36membedding. Otherwise, consider removing it since a future release of Flutter will remove these deprecated APIs.[39m
+[36mIf you are plugin author, take a look at the docs for migrating the plugin to the V2 embedding:[39m
+[36mhttps://flutter.dev/go/android-plugin-migration.[39m
+[31m/Users/naoya.yasuda/.pub-cache/hosted/pub.dev/camera_android-0.9.8+3/android/src/main/java/io/flutter/plugins/camera/features/resolution/ResolutionFeature.java:154: 警告:[deprecation] CamcorderProfileのget(int,int)は推奨されません[39m
+[31m          return CamcorderProfile.get(cameraId, CamcorderProfile.QUALITY_HIGH);[39m
+[31m                                 ^[39m
+[31m/Users/naoya.yasuda/.pub-cache/hosted/pub.dev/camera_android-0.9.8+3/android/src/main/java/io/flutter/plugins/camera/features/resolution/ResolutionFeature.java:158: 警告:[deprecation] CamcorderProfileのget(int,int)は推奨されません[39m
+[31m          return CamcorderProfile.get(cameraId, CamcorderProfile.QUALITY_2160P);[39m
+[31m                                 ^[39m
+[31m/Users/naoya.yasuda/.pub-cache/hosted/pub.dev/camera_android-0.9.8+3/android/src/main/java/io/flutter/plugins/camera/features/resolution/ResolutionFeature.java:162: 警告:[deprecation] CamcorderProfileのget(int,int)は推奨されません[39m
+[31m          return CamcorderProfile.get(cameraId, CamcorderProfile.QUALITY_1080P);[39m
+[31m                                 ^[39m
+[31m/Users/naoya.yasuda/.pub-cache/hosted/pub.dev/camera_android-0.9.8+3/android/src/main/java/io/flutter/plugins/camera/features/resolution/ResolutionFeature.java:166: 警告:[deprecation] CamcorderProfileのget(int,int)は推奨されません[39m
+[31m          return CamcorderProfile.get(cameraId, CamcorderProfile.QUALITY_720P);[39m
+[31m                                 ^[39m
+[31m/Users/naoya.yasuda/.pub-cache/hosted/pub.dev/camera_android-0.9.8+3/android/src/main/java/io/flutter/plugins/camera/features/resolution/ResolutionFeature.java:170: 警告:[deprecation] CamcorderProfileのget(int,int)は推奨されません[39m
+[31m          return CamcorderProfile.get(cameraId, CamcorderProfile.QUALITY_480P);[39m
+[31m                                 ^[39m
+[31m/Users/naoya.yasuda/.pub-cache/hosted/pub.dev/camera_android-0.9.8+3/android/src/main/java/io/flutter/plugins/camera/features/resolution/ResolutionFeature.java:174: 警告:[deprecation] CamcorderProfileのget(int,int)は推奨されません[39m
+[31m          return CamcorderProfile.get(cameraId, CamcorderProfile.QUALITY_QVGA);[39m
+[31m                                 ^[39m
+[31m/Users/naoya.yasuda/.pub-cache/hosted/pub.dev/camera_android-0.9.8+3/android/src/main/java/io/flutter/plugins/camera/features/resolution/ResolutionFeature.java:178: 警告:[deprecation] CamcorderProfileのget(int,int)は推奨されません[39m
+[31m          return CamcorderProfile.get(cameraId, CamcorderProfile.QUALITY_LOW);[39m
+[31m                                 ^[39m
+[31m警告7個[39m
+[31mノート:/Users/naoya.yasuda/.pub-cache/hosted/pub.dev/tflite-1.1.2/android/src/main/java/sq/flutter/tflite/TflitePlugin.javaは推奨されないAPIを使用またはオーバーライドしています。[39m
+[31mノート:詳細は、-Xlint:deprecationオプションを指定して再コンパイルしてください。[39m
+[31mノート:/Users/naoya.yasuda/.pub-cache/hosted/pub.dev/tflite-1.1.2/android/src/main/java/sq/flutter/tflite/TflitePlugin.javaの操作は、未チェックまたは安全ではありません。[39m
+[31mノート:詳細は、-Xlint:uncheckedオプションを指定して再コンパイルしてください。[39m
+[31mノート:/Users/naoya.yasuda/.pub-cache/hosted/pub.dev/tflite_flutter-0.9.5/android/src/main/java/com/tfliteflutter/tflite_flutter_plugin/TfliteFlutterPlugin.javaは推奨されないAPIを使用またはオーバーライドしています。[39m
+[31mノート:詳細は、-Xlint:deprecationオプションを指定して再コンパイルしてください。[39m
