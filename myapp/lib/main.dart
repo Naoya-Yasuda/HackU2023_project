@@ -42,18 +42,27 @@ class _CameraScreenState extends State<CameraScreen> {
     final cameras = await availableCameras();
     final camera = cameras.first;
     controller = CameraController(camera, ResolutionPreset.medium);
-    controller!.initialize().then((_) {
-      if (!mounted) {
-        return;
-      }
-      setState(() {});
+    await controller!.initialize();
+    if (!mounted) {
+      return;
+    }
+    setState(() {});
+  }
+
+  _startCameraStream() {
+    if (controller != null && controller!.value.isInitialized) {
       controller!.startImageStream((image) => _processImage(image));
-    });
+    }
   }
 
   _loadModel() async {
-    interpreter = await Interpreter.fromAsset(
-        'lite-model_imagenet_mobilenet_v3_small_100_224_classification_5_metadata_1.tflite');
+    try {
+      interpreter = await Interpreter.fromAsset(
+          'assets/lite-model_imagenet_mobilenet_v3_small_100_224_classification_5_metadata_1.tflite');
+    } catch (e) {
+      print("Error loading model: $e");
+    }
+    _startCameraStream(); // モデルのロードが完了した後、カメラのストリームを開始します
   }
 
   Float32List _convertYUV420ToNV21(CameraImage image) {
