@@ -4,6 +4,7 @@ import 'package:tflite_flutter/tflite_flutter.dart';
 import 'dart:typed_data';
 import 'dart:math';
 import 'package:flutter/services.dart';
+import 'package:image/image.dart' as img;
 
 void main() => runApp(MyApp());
 
@@ -88,15 +89,16 @@ class _CameraScreenState extends State<CameraScreen> {
   }
 
   _processImage(CameraImage image) async {
-    Float32List inputImage = _convertYUV420ToNV21(image);
-    Float32List modelInput = Float32List(1 * 224 * 224 * 3);
-
-    for (var i = 0; i < inputImage.length; i++) {
-      modelInput[i] = (inputImage[i] - 127.5) / 127.5;
+    if (interpreter == null) {
+      print('Interpreter is not initialized');
+      return;
     }
 
-    Float32List outputBuffer = Float32List(1000);
+    img.Image rgbImage = _convertYUV420ToRGB(image);
+    img.Image resizedImage = img.copyResize(rgbImage, width: 224, height: 224);
+    Float32List modelInput = _imageToFloat32List(resizedImage);
 
+    Float32List outputBuffer = Float32List(1000);
     interpreter!.run(modelInput, outputBuffer);
 
     final predictedLabelIndex = outputBuffer
@@ -109,6 +111,54 @@ class _CameraScreenState extends State<CameraScreen> {
     });
   }
 
+  img.Image _convertYUV420ToRGB(CameraImage image) {
+    final int width = image.width;
+    final int height = image.height;
+
+    final int uvRowStride = image.planes[1].bytesPerRow;
+    final int uvPixelStride = image.planes[1].bytesPerRow ~/ width;
+
+    var imageBuffer = img.Image(width, height); // Create Image buffer
+
+    for (int y = 0; y < height; y++) {
+      for (int x = 0; x < width; x++) {
+        final int uvIndex =
+            uvPixelStride * (x / 2).floor() + uvRowStride * (y / 2).floor();
+        final int index = y * width + x;
+
+        final yp = image.planes[0].bytes[index];
+        final up = image.planes[1].bytes[uvIndex];
+        final vp = image.planes[2].bytes[uvIndex];
+
+        // Convert yuv pixel to rgb
+        int r = (yp + vp * 1436 / 1024 - 179).round().clamp(0, 255);
+        int g = (yp - up * 46549 / 131072 + 44 - vp * 93604 / 131072 + 91)
+            .round()
+            .clamp(0, 255);
+        int b = (yp + up * 1814 / 1024 - 227).round().clamp(0, 255);
+
+        // Set pixel color
+        imageBuffer.setPixel(x, y, img.getColor(r, g, b));
+      }
+    }
+    return imageBuffer;
+  }
+
+  Float32List _imageToFloat32List(img.Image image) {
+    var convertedBytes = Float32List(1 * 224 * 224 * 3);
+    var buffer = Float32List.view(convertedBytes.buffer);
+    int pixelIndex = 0;
+    for (int y = 0; y < 224; y++) {
+      for (int x = 0; x < 224; x++) {
+        var pixel = image.getPixel(x, y);
+        buffer[pixelIndex++] = (img.getRed(pixel) - 127.5) / 127.5;
+        buffer[pixelIndex++] = (img.getGreen(pixel) - 127.5) / 127.5;
+        buffer[pixelIndex++] = (img.getBlue(pixel) - 127.5) / 127.5;
+      }
+    }
+    return buffer;
+  }
+
   @override
   Widget build(BuildContext context) {
     if (controller == null || !controller!.value.isInitialized) {
@@ -119,7 +169,7 @@ class _CameraScreenState extends State<CameraScreen> {
       body: Stack(
         children: <Widget>[
           CameraPreview(controller!),
-          if (label != null) ...[
+          if (label != null && label!.isNotEmpty) ...[
             Positioned(
               bottom: 10,
               child: Text('Detected: $label',
