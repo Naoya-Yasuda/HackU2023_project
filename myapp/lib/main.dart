@@ -30,6 +30,7 @@ class _CameraScreenState extends State<CameraScreen> {
   CameraController? controller;
   Interpreter? interpreter;
   String? label;
+  List<String>? labels; // ラベルリストをクラス変数として追加
 
   @override
   void initState() {
@@ -39,85 +40,84 @@ class _CameraScreenState extends State<CameraScreen> {
   }
 
   _initializeCamera() async {
-    final cameras = await availableCameras();
-    final camera = cameras.first;
-    controller = CameraController(camera, ResolutionPreset.medium);
-    await controller!.initialize();
-    if (!mounted) {
-      return;
-    }
-    setState(() {});
-  }
-
-  _startCameraStream() {
-    if (controller != null && controller!.value.isInitialized) {
-      controller!.startImageStream((image) => _processImage(image));
+    try {
+      final cameras = await availableCameras();
+      final camera = cameras.first;
+      controller = CameraController(camera, ResolutionPreset.medium,
+          imageFormatGroup: ImageFormatGroup.yuv420);
+      await controller!.initialize();
+      if (!mounted) {
+        print('not mounted');
+        return;
+      }
+      setState(() {});
+    } catch (e) {
+      print("Error initializing camera: $e");
     }
   }
 
   _loadModel() async {
     try {
       interpreter = await Interpreter.fromAsset(
-          'assets/lite-model_imagenet_mobilenet_v3_small_100_224_classification_5_metadata_1.tflite');
+          'lite-model_imagenet_mobilenet_v3_small_100_224_classification_5_metadata_1.tflite');
+      labels = await getLabelsFromAsset(); // モデルの読み込みと同時にラベルも読み込む
+      _startCameraStream();
     } catch (e) {
       print("Error loading model: $e");
     }
-    _startCameraStream(); // モデルのロードが完了した後、カメラのストリームを開始します
   }
 
-  Float32List _convertYUV420ToNV21(CameraImage image) {
-    final int width = image.width;
-    final int height = image.height;
-
-    var nv21 = Uint8List(width * height * 3 ~/ 2);
-
-    var yData = image.planes[0].bytes;
-    var uData = image.planes[1].bytes;
-    var vData = image.planes[2].bytes;
-
-    int uvIndex = 0;
-    int index = width * height;
-
-    for (int i = 0; i < width * height; i++) {
-      nv21[i] = yData[i];
-
-      if (i % 2 == 0) {
-        nv21[index++] = vData[uvIndex];
-        nv21[index++] = uData[uvIndex];
-        uvIndex++;
+  _startCameraStream() {
+    try {
+      if (controller != null && controller!.value.isInitialized) {
+        controller!.startImageStream((image) => _processImage(image));
+      } else {
+        print('Camera controller is not initialized');
       }
+    } catch (e) {
+      print("Error starting camera stream: $e");
     }
-
-    return nv21.buffer.asFloat32List();
   }
 
-// assets/labels.txtからラベルを取得する関数
+  // assets/labels.txtからラベルを取得する関数
   Future<List<String>> getLabelsFromAsset() async {
-    String data = await rootBundle.loadString('assets/labels.txt');
-    return data.split('\n'); // ラベルは各行に1つずつ存在すると仮定
+    try {
+      String data = await rootBundle.loadString('assets/labels.txt');
+      return data.split('\n');
+    } catch (e) {
+      print("Error loading labels: $e");
+      return [];
+    }
   }
 
   _processImage(CameraImage image) async {
-    if (interpreter == null) {
-      print('Interpreter is not initialized');
-      return;
+    print('_processImage start');
+    try {
+      if (interpreter == null) {
+        print('Interpreter is not initialized');
+        return;
+      }
+
+      img.Image rgbImage = _convertYUV420ToRGB(image);
+      img.Image resizedImage =
+          img.copyResize(rgbImage, width: 224, height: 224);
+      Float32List modelInput = _imageToFloat32List(resizedImage);
+
+      Float32List outputBuffer = Float32List(1000);
+      interpreter!.run(modelInput, outputBuffer);
+
+      final predictedLabelIndex = outputBuffer
+          .indexWhere((probability) => probability == outputBuffer.reduce(max));
+
+      List<String> labels = await getLabelsFromAsset();
+
+      setState(() {
+        label = labels[predictedLabelIndex];
+        print('Detected label: $label');
+      });
+    } catch (e) {
+      print("Error processing image: $e");
     }
-
-    img.Image rgbImage = _convertYUV420ToRGB(image);
-    img.Image resizedImage = img.copyResize(rgbImage, width: 224, height: 224);
-    Float32List modelInput = _imageToFloat32List(resizedImage);
-
-    Float32List outputBuffer = Float32List(1000);
-    interpreter!.run(modelInput, outputBuffer);
-
-    final predictedLabelIndex = outputBuffer
-        .indexWhere((probability) => probability == outputBuffer.reduce(max));
-
-    List<String> labels = await getLabelsFromAsset(); // ラベルをassetsから取得
-
-    setState(() {
-      label = labels[predictedLabelIndex];
-    });
   }
 
   img.Image _convertYUV420ToRGB(CameraImage image) {
@@ -128,6 +128,7 @@ class _CameraScreenState extends State<CameraScreen> {
     final int uvPixelStride = image.planes[1].bytesPerRow ~/ width;
 
     var imageBuffer = img.Image(width, height); // Create Image buffer
+    print('imageBuffer:$imageBuffer');
 
     for (int y = 0; y < height; y++) {
       for (int x = 0; x < width; x++) {
@@ -150,10 +151,12 @@ class _CameraScreenState extends State<CameraScreen> {
         imageBuffer.setPixel(x, y, img.getColor(r, g, b));
       }
     }
+    print('imageBuffer:$imageBuffer');
     return imageBuffer;
   }
 
   Float32List _imageToFloat32List(img.Image image) {
+    print('image:$image');
     var convertedBytes = Float32List(1 * 224 * 224 * 3);
     var buffer = Float32List.view(convertedBytes.buffer);
     int pixelIndex = 0;
@@ -165,12 +168,14 @@ class _CameraScreenState extends State<CameraScreen> {
         buffer[pixelIndex++] = (img.getBlue(pixel) - 127.5) / 127.5;
       }
     }
+    print('_imageToFloat32List buffer:$buffer');
     return buffer;
   }
 
   @override
   Widget build(BuildContext context) {
     if (controller == null || !controller!.value.isInitialized) {
+      print('controller not isInitialized in build');
       return Container();
     }
     return Scaffold(
@@ -193,6 +198,7 @@ class _CameraScreenState extends State<CameraScreen> {
   @override
   void dispose() {
     controller?.dispose();
+    controller?.stopImageStream(); // カメラストリームを停止
     super.dispose();
   }
 }
