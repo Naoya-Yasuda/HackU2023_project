@@ -1,0 +1,60 @@
+The plugin `tflite` uses a deprecated version of the Android embedding.
+To avoid unexpected runtime failures, or future build failures, try to see if this plugin supports the Android V2 embedding. Otherwise, consider removing it since a future release of Flutter will remove these deprecated APIs.
+If you are plugin author, take a look at the docs for migrating the plugin to the V2 embedding: https://flutter.dev/go/android-plugin-migration.
+Launching lib/main.dart on CPH2099 in debug mode...
+Running Gradle task 'assembleDebug'...                              5.6s
+✓  Built build/app/outputs/flutter-apk/app-debug.apk.
+Installing build/app/outputs/flutter-apk/app-debug.apk...          11.5s
+Syncing files to device CPH2099...                                  83ms
+
+Flutter run key commands.
+r Hot reload. 🔥🔥🔥
+R Hot restart.
+h List all available interactive commands.
+d Detach (terminate "flutter run" but leave application running).
+c Clear the screen
+q Quit (terminate the application on the device).
+
+A Dart VM Service on CPH2099 is available at: http://127.0.0.1:64802/KQiJtERkqi8=/
+I/OplusCameraManager(11369): saveOpPackageName, mOpPackageName: com.example.myapp
+I/OplusCameraManagerGlobal(11369): setClientInfo, packageName: com.example.myapp, uid: 10462, pid: 11369
+I/OplusCameraManagerGlobal(11369): Connecting to camera service
+I/CameraManagerGlobal(11369): Connecting to camera service
+W/m.example.myapp(11369): type=1400 audit(0.0:46846): avc: denied { read } for name="u:object_r:vendor_persist_camera_prop:s0" dev="tmpfs" ino=1392 scontext=u:r:untrusted_app:s0:c206,c257,c512,c768 tcontext=u:object_r:vendor_persist_camera_prop:s0 tclass=file permissive=0 app=com.example.myapp
+E/libc    (11369): Access denied finding property "vendor.camera.aux.packagelist"
+E/libc    (11369): Access denied finding property "vendor.camera.aux.packagelist"
+E/libc    (11369): Access denied finding property "vendor.camera.aux.packagelist"
+I/OplusCameraManagerGlobal(11369): setClientInfo, packageName: com.example.myapp, uid: 10462, pid: 11369
+E/libc    (11369): Access denied finding property "vendor.camera.aux.packagelist"
+W/CameraManagerGlobal(11369): ignore the torch status update of camera: 5
+E/libc    (11369): Access denied finding property "vendor.camera.aux.packagelist"
+W/CameraManagerGlobal(11369): ignore the torch status update of camera: 6
+I/OplusCameraManagerGlobal(11369): setClientInfo, packageName: com.example.myapp, uid: 10462, pid: 11369
+E/libc    (11369): Access denied finding property "vendor.camera.aux.packagelist"
+W/CameraManagerGlobal(11369): ignore the torch status update of camera: 7
+I/OplusCameraManagerGlobal(11369): setClientInfo, packageName: com.example.myapp, uid: 10462, pid: 11369
+I/chatty  (11369): uid=10462(com.example.myapp) identical 2 lines
+I/OplusCameraManagerGlobal(11369): setClientInfo, packageName: com.example.myapp, uid: 10462, pid: 11369
+The Flutter DevTools debugger and profiler on CPH2099 is available at: http://127.0.0.1:9103?uri=http://127.0.0.1:64802/KQiJtERkqi8=/
+I/flutter (11369): Error loading model: Unable to load asset: "assets/assets/lite-model_imagenet_mobilenet_v3_small_100_224_classification_5_metadata_1.tflite".
+I/flutter (11369): The asset does not exist or has empty data.
+I/OplusCameraManagerGlobal(11369): setClientInfo, packageName: com.example.myapp, uid: 10462, pid: 11369
+I/chatty  (11369): uid=10462(com.example.myapp) identical 1 line
+I/OplusCameraManagerGlobal(11369): setClientInfo, packageName: com.example.myapp, uid: 10462, pid: 11369
+W/Camera  (11369): The selected imageFormatGroup is not supported by Android. Defaulting to yuv420
+I/OplusCameraManagerGlobal(11369): setClientInfo, packageName: com.example.myapp, uid: 10462, pid: 11369
+I/chatty  (11369): uid=10462(com.example.myapp) identical 1 line
+I/OplusCameraManagerGlobal(11369): setClientInfo, packageName: com.example.myapp, uid: 10462, pid: 11369
+W/m.example.myapp(11369): type=1400 audit(0.0:46853): avc: denied { read } for name="u:object_r:vendor_persist_camera_prop:s0" dev="tmpfs" ino=1392 scontext=u:r:untrusted_app:s0:c206,c257,c512,c768 tcontext=u:object_r:vendor_persist_camera_prop:s0 tclass=file permissive=0 app=com.example.myapp
+E/libc    (11369): Access denied finding property "persist.vendor.camera.privapp.list"
+I/OplusCameraManagerGlobal(11369): setClientInfo, packageName: com.example.myapp, uid: 10462, pid: 11369
+I/OplusCameraManagerGlobal(11369): setClientInfo, packageName: com.example.myapp, uid: 10462, pid: 11369
+I/Camera  (11369): open | onError
+I/Camera  (11369): close
+E/flutter (11369): [ERROR:flutter/runtime/dart_vm_initializer.cc(41)] Unhandled Exception: CameraException(CameraAccess, CAMERA_DISABLED (1): validateClientPermissionsLocked:1219: Caller "com.example.myapp" (PID 10462, UID 11369) cannot open camera "0" from background (calling UID 10462 proc state 21))
+E/flutter (11369): #0      StandardMethodCodec.decodeEnvelope (package:flutter/src/services/message_codecs.dart:652:7)
+E/flutter (11369): #1      MethodChannel._invokeMethod (package:flutter/src/services/platform_channel.dart:310:18)
+E/flutter (11369): <asynchronous suspension>
+E/flutter (11369): #2      MethodChannel.invokeMapMethod (package:flutter/src/services/platform_channel.dart:510:43)
+E/flutter (11369): <asynchronous suspension>
+E/flutter (11369): 
