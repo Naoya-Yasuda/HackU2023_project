@@ -59,7 +59,6 @@ class _HomeScreenState extends BaseStateful<HomeScreen, HomeViewModel>
   }
 
   void initCamera() {
-    print("Initializing the camera...");
     _cameraController = CameraController(
         cameras[viewModel.state.cameraIndex], ResolutionPreset.high);
     _initializeControllerFuture = _cameraController.initialize().then((_) {
@@ -67,7 +66,6 @@ class _HomeScreenState extends BaseStateful<HomeScreen, HomeViewModel>
         return;
       }
       _cameraController.setFlashMode(FlashMode.off);
-
       /// TODO: Run Model
       setState(() {});
       _cameraController.startImageStream((image) async {
@@ -179,8 +177,7 @@ class _HomeScreenState extends BaseStateful<HomeScreen, HomeViewModel>
   }
 
   Future<bool> renderedAndSaveImage(Uint8List draw, XFile camera) async {
-    UI.Image cameraImage =
-        await decodeImageFromList(await camera.readAsBytes());
+    UI.Image cameraImage = await decodeImageFromList(await camera.readAsBytes());
 
     UI.Codec codec = await UI.instantiateImageCodec(draw);
     var detectionImage = (await codec.getNextFrame()).image;
@@ -204,13 +201,12 @@ class _HomeScreenState extends BaseStateful<HomeScreen, HomeViewModel>
         recorder,
         Rect.fromPoints(
             new Offset(0.0, 0.0),
-            new Offset(
-                cameraImage.width.toDouble(), cameraImage.height.toDouble())));
+            new Offset(cameraImage.width.toDouble(),
+                cameraImage.height.toDouble())));
 
     canvas.drawImage(cameraImage, Offset.zero, Paint());
 
-    codec = await UI.instantiateImageCodec(draw,
-        targetWidth: scaleWidth.toInt(), targetHeight: scaleHeight.toInt());
+    codec = await UI.instantiateImageCodec(draw, targetWidth: scaleWidth.toInt(), targetHeight: scaleHeight.toInt());
     detectionImage = (await codec.getNextFrame()).image;
 
     canvas.drawImage(detectionImage, Offset(difW.abs(), difH.abs()), Paint());
@@ -224,8 +220,7 @@ class _HomeScreenState extends BaseStateful<HomeScreen, HomeViewModel>
 
     final pngBytes = await img.toByteData(format: UI.ImageByteFormat.png);
 
-    final result2 = await ImageGallerySaver.saveImage(
-        Uint8List.view(pngBytes!.buffer),
+    final result2 = await ImageGallerySaver.saveImage(Uint8List.view(pngBytes!.buffer),
         quality: 100,
         name: 'realtime_object_detection_${DateTime.now()}');
     print(result2);

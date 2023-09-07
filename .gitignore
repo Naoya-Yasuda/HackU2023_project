@@ -8,8 +8,6 @@
 .buildlog/
 .history
 .svn/
-migrate_working_dir/
-error_log.txt
 
 # IntelliJ related
 *.iml
@@ -32,6 +30,9 @@ error_log.txt
 .pub-cache/
 .pub/
 /build/
+
+# Web related
+lib/generated_plugin_registrant.dart
 
 # Symbolication related
 app.*.symbols

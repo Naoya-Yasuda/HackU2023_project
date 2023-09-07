@@ -19,7 +19,6 @@ class TensorFlowService {
     try {
       Tflite.close();
       String? res;
-      String? midasRes;
       switch (type) {
         case ModelType.YOLO:
           res = await Tflite.loadModel(
@@ -45,10 +44,7 @@ class TensorFlowService {
               model: 'assets/models/yolov2_tiny.tflite',
               labels: 'assets/models/yolov2_tiny.txt');
       }
-      midasRes = await Tflite.loadModel(
-          model: 'assets/models/depth_estimation.tflite',
-          labels: 'assets/models/depth_estimation.txt');
-      print('loadModel: $res - $_type - $midasRes');
+      print('loadModel: $res - $_type');
     } on PlatformException {
       print('Failed to load model.');
     }
@@ -91,12 +87,13 @@ class TensorFlowService {
         break;
       case ModelType.MobileNet:
         recognitions = await Tflite.runModelOnFrame(
-            bytesList: image.planes.map((plane) {
-              return plane.bytes;
-            }).toList(),
-            imageHeight: image.height,
-            imageWidth: image.width,
-            numResults: 5);
+          bytesList: image.planes.map((plane) {
+            return plane.bytes;
+          }).toList(),
+          imageHeight: image.height,
+          imageWidth: image.width,
+          numResults: 5
+        );
         break;
       case ModelType.PoseNet:
         recognitions = await Tflite.runPoseNetOnFrame(
@@ -105,45 +102,13 @@ class TensorFlowService {
             }).toList(),
             imageHeight: image.height,
             imageWidth: image.width,
-            numResults: 5);
+            numResults: 5
+        );
         break;
       default:
     }
-    // Parameters for the depth estimation model
-    var depthEstimations = await Tflite.runModelOnFrame(
-      bytesList: image.planes.map((plane) {
-        return plane.bytes;
-      }).toList(),
-      imageHeight: image.height,
-      imageWidth: image.width,
-      imageMean: 127.5, // Assuming a range of [-1,1] for the model
-      imageStd: 127.5,
-      rotation: 0, // Adjust based on your camera's orientation
-      // ... any other specific parameters for the depth estimation model ...
-    );
-
     print("recognitions: $recognitions");
     return recognitions;
-  }
-
-  Future<List<dynamic>?> runMidasModelOnFrame(CameraImage image) async {
-    List<dynamic>? depthEstimations = <dynamic>[];
-
-    // Parameters for the depth estimation model
-    depthEstimations = await Tflite.runModelOnFrame(
-      bytesList: image.planes.map((plane) {
-        return plane.bytes;
-      }).toList(),
-      imageHeight: image.height,
-      imageWidth: image.width,
-      imageMean: 127.5, // Assuming a range of [-1,1] for the model
-      imageStd: 127.5,
-      rotation: 0, // Adjust based on your camera's orientation
-      // ... any other specific parameters for the depth estimation model ...
-    );
-
-    print("depthEstimations: $depthEstimations");
-    return depthEstimations;
   }
 
   Future<List<dynamic>?> runModelOnImage(File image) async {
