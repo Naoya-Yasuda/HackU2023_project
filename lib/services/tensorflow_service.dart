@@ -113,6 +113,26 @@ class TensorFlowService {
     return recognitions;
   }
 
+  Future<List<dynamic>?> runMidasModelOnFrame(CameraImage image) async {
+    List<dynamic>? depthEstimations = <dynamic>[];
+
+    // Parameters for the depth estimation model
+    depthEstimations = await Tflite.runModelOnFrame(
+      bytesList: image.planes.map((plane) {
+        return plane.bytes;
+      }).toList(),
+      imageHeight: image.height,
+      imageWidth: image.width,
+      imageMean: 127.5, // Assuming a range of [-1,1] for the model
+      imageStd: 127.5,
+      rotation: 0, // Adjust based on your camera's orientation
+      // ... any other specific parameters for the depth estimation model ...
+    );
+
+    print("depthEstimations: $depthEstimations");
+    return depthEstimations;
+  }
+
   Future<List<dynamic>?> runModelOnImage(File image) async {
     var recognitions = await Tflite.detectObjectOnImage(
         path: image.path,

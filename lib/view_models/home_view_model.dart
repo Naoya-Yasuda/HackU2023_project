@@ -34,6 +34,9 @@ class HomeViewModel extends BaseViewModel<HomeViewState> {
         int startTime = new DateTime.now().millisecondsSinceEpoch;
         var recognitions =
             await this._tensorFlowService.runModelOnFrame(cameraImage);
+        //var depthEstimations =
+        //await this._tensorFlowService.runMidasModelOnFrame(cameraImage);
+        //print('depthEstimations:${depthEstimations.toString()}');
         int endTime = new DateTime.now().millisecondsSinceEpoch;
         print('Time detection: ${endTime - startTime}');
         if (recognitions != null && mounted) {
@@ -46,7 +49,8 @@ class HomeViewModel extends BaseViewModel<HomeViewState> {
         this._isDetecting = false;
       }
     } else {
-      print('Please run `loadModel(type)` before running `runModel(cameraImage)`');
+      print(
+          'Please run `loadModel(type)` before running `runModel(cameraImage)`');
     }
   }
 
@@ -57,5 +61,4 @@ class HomeViewModel extends BaseViewModel<HomeViewState> {
   void updateTypeTfLite(ModelType item) {
     this._tensorFlowService.type = item;
   }
-
 }
