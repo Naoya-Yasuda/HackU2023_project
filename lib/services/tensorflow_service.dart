@@ -19,6 +19,7 @@ class TensorFlowService {
     try {
       Tflite.close();
       String? res;
+      String? midasRes;
       switch (type) {
         case ModelType.YOLO:
           res = await Tflite.loadModel(
@@ -44,7 +45,10 @@ class TensorFlowService {
               model: 'assets/models/yolov2_tiny.tflite',
               labels: 'assets/models/yolov2_tiny.txt');
       }
-      print('loadModel: $res - $_type');
+      midasRes = await Tflite.loadModel(
+          model: 'assets/models/model_midas_v2_1_small_1_lite_1.tflite',
+          labels: 'assets/models/model_midas_v2_1_small_1_lite_1.txt');
+      print('loadModel: $res - $_type - $midasRes');
     } on PlatformException {
       print('Failed to load model.');
     }
@@ -87,13 +91,12 @@ class TensorFlowService {
         break;
       case ModelType.MobileNet:
         recognitions = await Tflite.runModelOnFrame(
-          bytesList: image.planes.map((plane) {
-            return plane.bytes;
-          }).toList(),
-          imageHeight: image.height,
-          imageWidth: image.width,
-          numResults: 5
-        );
+            bytesList: image.planes.map((plane) {
+              return plane.bytes;
+            }).toList(),
+            imageHeight: image.height,
+            imageWidth: image.width,
+            numResults: 5);
         break;
       case ModelType.PoseNet:
         recognitions = await Tflite.runPoseNetOnFrame(
@@ -102,8 +105,7 @@ class TensorFlowService {
             }).toList(),
             imageHeight: image.height,
             imageWidth: image.width,
-            numResults: 5
-        );
+            numResults: 5);
         break;
       default:
     }
