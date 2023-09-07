@@ -46,8 +46,8 @@ class TensorFlowService {
               labels: 'assets/models/yolov2_tiny.txt');
       }
       midasRes = await Tflite.loadModel(
-          model: 'assets/models/model_midas_v2_1_small_1_lite_1.tflite',
-          labels: 'assets/models/model_midas_v2_1_small_1_lite_1.txt');
+          model: 'assets/models/lite-model_midas_v2_1_small_1_lite_1.tflite',
+          labels: 'assets/models/lite-model_midas_v2_1_small_1_lite_1.txt');
       print('loadModel: $res - $_type - $midasRes');
     } on PlatformException {
       print('Failed to load model.');
