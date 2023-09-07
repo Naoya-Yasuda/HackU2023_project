@@ -9,6 +9,8 @@
 .history
 .svn/
 *log.txt
+pubspec.lock
+*.zip
 
 # IntelliJ related
 *.iml

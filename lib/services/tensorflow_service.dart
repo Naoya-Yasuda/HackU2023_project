@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/services.dart';
 import 'package:tflite/tflite.dart';
+import 'package:image/image.dart' as img;
 
 enum ModelType { YOLO, SSDMobileNet, MobileNet, PoseNet }
 
@@ -116,22 +117,107 @@ class TensorFlowService {
   Future<List<dynamic>?> runMidasModelOnFrame(CameraImage image) async {
     List<dynamic>? depthEstimations = <dynamic>[];
 
-    // Parameters for the depth estimation model
-    depthEstimations = await Tflite.runModelOnFrame(
-      bytesList: image.planes.map((plane) {
-        return plane.bytes;
-      }).toList(),
-      imageHeight: image.height,
-      imageWidth: image.width,
-      imageMean: 127.5, // Assuming a range of [-1,1] for the model
-      imageStd: 127.5,
-      rotation: 0, // Adjust based on your camera's orientation
-      // ... any other specific parameters for the depth estimation model ...
-    );
+    Uint8List uint8listImage = convertCameraImageToUint8List(image);
+
+    var resizedImage = resizeImage(uint8listImage, 256, 256);
+
+    depthEstimations = await Tflite.runModelOnBinary(
+        binary: Uint8List.fromList(resizedImage.buffer.asUint8List()),
+        numResults: 1,
+        threshold: 0.1,
+        asynch: true);
 
     print("depthEstimations: $depthEstimations");
     return depthEstimations;
   }
+
+  Uint8List convertCameraImageToUint8List(CameraImage image) {
+    final int width = image.width;
+    final int height = image.height;
+
+    var img = Uint8List(width * height * 3);
+    var buffer = img.buffer.asByteData();
+
+    for (int y = 0; y < height; y++) {
+      for (int x = 0; x < width; x++) {
+        final int pixelIndex = y * width + x;
+        final int bufferIndex = pixelIndex * 3;
+
+        final int r = image.planes[0].bytes[pixelIndex];
+        final int g = image.planes[1].bytes[pixelIndex];
+        final int b = image.planes[2].bytes[pixelIndex];
+
+        buffer.setUint8(bufferIndex, r);
+        buffer.setUint8(bufferIndex + 1, g);
+        buffer.setUint8(bufferIndex + 2, b);
+      }
+    }
+    return img;
+  }
+
+  Uint8List resizeImage(Uint8List image, int width, int height) {
+    img.Image? originalImage = img.decodeImage(image);
+    if (originalImage == null) {
+      throw Exception("Failed to decode the image.");
+    }
+
+    img.Image resizedImg =
+        img.copyResize(originalImage, width: width, height: height);
+    return Uint8List.fromList(img.encodePng(resizedImg));
+  }
+
+  // Future<List<dynamic>?> runMidasModelOnFrame(CameraImage image) async {
+  //   List<dynamic>? depthEstimations = <dynamic>[];
+
+  //   Uint8List uint8listImage = convertCameraImageToUint8List(image);
+  //   var resizedImage = resizeImageWithTensorFlow(uint8listImage, 256, 256);
+
+  //   depthEstimations = await Tflite.runModelOnFrame(
+  //     bytesList: [resizedImage],
+  //     imageHeight: 256,
+  //     imageWidth: 256,
+  //     imageMean: 127.5,
+  //     imageStd: 127.5,
+  //     rotation: 0,
+  //     // ... other parameters ...
+  //   );
+
+  //   print("depthEstimations: $depthEstimations");
+  //   return depthEstimations;
+  // }
+
+  // Uint8List convertCameraImageToUint8List(CameraImage image) {
+  //   final int width = image.width;
+  //   final int height = image.height;
+
+  //   var img = Uint8List(width * height * 3); // Assuming RGB format
+  //   var buffer =
+  //       img.buffer.asByteData(); // Use ByteData to manipulate byte-level data
+
+  //   for (int y = 0; y < height; y++) {
+  //     for (int x = 0; x < width; x++) {
+  //       final int pixelIndex = y * width + x;
+  //       final int bufferIndex = pixelIndex * 3;
+
+  //       // Get pixel values from the planes
+  //       final int r = image.planes[0].bytes[pixelIndex];
+  //       final int g = image.planes[1].bytes[pixelIndex];
+  //       final int b = image.planes[2].bytes[pixelIndex];
+
+  //       buffer.setUint8(bufferIndex, r);
+  //       buffer.setUint8(bufferIndex + 1, g);
+  //       buffer.setUint8(bufferIndex + 2, b);
+  //     }
+  //   }
+
+  //   return img;
+  // }
+
+  // Uint8List resizeImageWithTensorFlow(Uint8List image, int width, int height) {
+  //   var tensor = tf.tensor3d(image, shape: [imageHeight, imageWidth, 3]);
+  //   var resizedTensor = tf.image.resizeBilinear(tensor, [width, height]);
+  //   return resizedTensor.dataSync();
+  // }
 
   Future<List<dynamic>?> runModelOnImage(File image) async {
     var recognitions = await Tflite.detectObjectOnImage(
