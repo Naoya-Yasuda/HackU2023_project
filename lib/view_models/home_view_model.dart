@@ -34,9 +34,6 @@ class HomeViewModel extends BaseViewModel<HomeViewState> {
         int startTime = new DateTime.now().millisecondsSinceEpoch;
         var recognitions =
             await this._tensorFlowService.runModelOnFrame(cameraImage);
-        //var depthEstimations =
-        //await this._tensorFlowService.runMidasModelOnFrame(cameraImage);
-        //print('depthEstimations:${depthEstimations.toString()}');
         int endTime = new DateTime.now().millisecondsSinceEpoch;
         print('Time detection: ${endTime - startTime}');
         if (recognitions != null && mounted) {

@@ -64,8 +64,6 @@ flutter:
     - assets/models/mobilenet_v1.txt
     - assets/models/mobilenet_v1.tflite
     - assets/models/posenet_mv1_checkpoints.tflite
-    - assets/models/lite-model_midas_v2_1_small_1_lite_1.tflite
-    - assets/models/lite-model_midas_v2_1_small_1_lite_1.txt
     - assets/fonts/
     - assets/images/
 
