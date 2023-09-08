@@ -142,7 +142,8 @@ class TensorFlowService {
             '--------------- width: $width height: $height predefinedSize: $predefinedSize');
         if (width > predefinedSize?.width || height > predefinedSize?.height) {
           print('Warning: Detected $label is larger than predefined size!');
-          //TODO: 音声で警告を出す
+          //TODO: 方向を方向を判定する
+          //TODO: 読み上げ中は次の読み上げを中断する
           var direction = '右斜め前';
           ttsNotifier.onObjectDetected(label, direction);
         }
