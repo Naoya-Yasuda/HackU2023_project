@@ -23,7 +23,6 @@ class TTSNotifier {
   }
 
   onObjectDetected(String objectName, String direction) {
-    // TODO: ラベルが英語なので、日本語に変換するメソッドを作成する
     // TODO: ある大きさ以上の物体(車、人)が検出されたときは「危険です、避けてください」的な内容に分岐させる
     String message = "$objectNameが$directionの方向にあります。";
     speak(message);
