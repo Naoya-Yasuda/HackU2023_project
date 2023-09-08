@@ -138,13 +138,18 @@ class TensorFlowService {
         var predefinedSize = predefinedSizes[label]?[1];
         var width = obj['rect']['w'] * imageWidth;
         var height = obj['rect']['h'] * imageHeight;
-        print(
-            '--------------- width: $width height: $height predefinedSize: $predefinedSize');
+
         if (width > predefinedSize?.width || height > predefinedSize?.height) {
-          print('Warning: Detected $label is larger than predefined size!');
-          //TODO: 方向を方向を判定する
-          //TODO: 読み上げ中は次の読み上げを中断する
-          var direction = '右斜め前';
+          // 検知物体の方向を判定する
+          double objectCenterX = obj['rect']['x'] + obj['rect']['w'] / 2;
+          String direction;
+          if (objectCenterX < 0.25) {
+            direction = '左前';
+          } else if (objectCenterX > 0.75) {
+            direction = '右前';
+          } else {
+            direction = '目の前';
+          }
           ttsNotifier.onObjectDetected(predefinedSizes[label]?[0], direction);
         }
       }
