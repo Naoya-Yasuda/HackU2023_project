@@ -16,6 +16,13 @@ class TensorFlowService {
     _type = type;
   }
 
+  // 事前に定義された各ラベルのサイズの閾値
+  Map<String, Size> predefinedSizes = {
+    'person': Size(640, 360),
+    'chair': Size(40, 70),
+    // 他のラベルとサイズを追加できます
+  };
+
   loadModel(ModelType type) async {
     try {
       Tflite.close();
@@ -69,6 +76,7 @@ class TensorFlowService {
       threshold: 0.2,
       numResultsPerClass: 1,
     );
+    checkDetectedObjectSize(recognitions, image.width, image.height);
     return recognitions;
   }
 
@@ -116,5 +124,25 @@ class TensorFlowService {
         imageStd: 127.5,
         numResultsPerClass: 1);
     return recognitions;
+  }
+
+  void checkDetectedObjectSize(
+      List<dynamic>? recognitions, int imageWidth, int imageHeight) {
+    for (var obj in recognitions!) {
+      if (predefinedSizes.containsKey(obj['detectedClass'])) {
+        print(
+            '---------------checkDetectedObjectSize recognition: $obj.toString()');
+        var predefinedSize = predefinedSizes[obj['detectedClass']];
+        var width = obj['rect']['w'] * imageWidth;
+        var height = obj['rect']['h'] * imageHeight;
+        print(
+            '--------------- width: $width height: $height predefinedSize: $predefinedSize');
+        if (width > predefinedSize?.width || height > predefinedSize?.height) {
+          print(
+              'Warning: Detected ${obj['detectedClass']} is larger than predefined size!');
+          //TODO: 音声で警告を出す
+        }
+      }
+    }
   }
 }
