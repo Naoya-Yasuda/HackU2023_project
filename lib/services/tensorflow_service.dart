@@ -17,9 +17,10 @@ class TensorFlowService {
   }
 
   // 事前に定義された各ラベルのサイズの閾値
-  Map<String, List<dynamic>> predefinedSizes = {
+  Map<String, List<dynamic>> predefinedObj = {
     'person': ['人間', Size(640, 360)],
-    'chair': ['椅子', Size(40, 70)],
+    'chair': ['椅子', Size(300, 150)],
+    'keyboard': ['キーボード', Size(40, 70)],
     // 他のラベルとサイズを追加できます
   };
 
@@ -132,10 +133,10 @@ class TensorFlowService {
       List<dynamic>? recognitions, int imageWidth, int imageHeight) {
     for (var obj in recognitions!) {
       var label = obj['detectedClass'];
-      if (predefinedSizes.containsKey(label)) {
+      if (predefinedObj.containsKey(label)) {
         print(
             '---------------checkDetectedObjectSize recognition: $obj.toString()');
-        var predefinedSize = predefinedSizes[label]?[1];
+        var predefinedSize = predefinedObj[label]?[1];
         var width = obj['rect']['w'] * imageWidth;
         var height = obj['rect']['h'] * imageHeight;
 
@@ -150,7 +151,7 @@ class TensorFlowService {
           } else {
             direction = '目の前';
           }
-          ttsNotifier.onObjectDetected(predefinedSizes[label]?[0], direction);
+          ttsNotifier.onObjectDetected(predefinedObj[label], direction);
         }
       }
     }
