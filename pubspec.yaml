@@ -37,8 +37,9 @@ dependencies:
   url_launcher: ^6.0.9
   image_picker: ^0.8.2
   screenshot: ^2.1.0
-  image_gallery_saver: '^1.6.9'
+  image_gallery_saver: ^1.6.9
   image: ^3.0.1
+  flutter_tts: ^3.2.2
 
 dev_dependencies:
   flutter_test:

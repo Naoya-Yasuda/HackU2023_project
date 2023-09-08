@@ -1,9 +1,9 @@
 import 'dart:io';
-
 import 'package:camera/camera.dart';
 import 'package:flutter/services.dart';
 import 'package:tflite/tflite.dart';
 import 'package:image/image.dart' as img;
+import 'package:flutter_tts/flutter_tts.dart';
 
 enum ModelType { YOLO, SSDMobileNet, MobileNet, PoseNet }
 
@@ -22,6 +22,8 @@ class TensorFlowService {
     'chair': Size(40, 70),
     // 他のラベルとサイズを追加できます
   };
+
+  final ttsNotifier = TTSNotifier();
 
   loadModel(ModelType type) async {
     try {
