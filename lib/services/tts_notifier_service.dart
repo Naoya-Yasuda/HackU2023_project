@@ -4,7 +4,7 @@ class TTSNotifier {
   final FlutterTts flutterTts = FlutterTts();
 
   TTSNotifier() {
-    flutterTts.setLanguage("en-US"); // 言語を設定します
+    flutterTts.setLanguage("ja-JP"); // 言語を設定します
     flutterTts.setPitch(1.0); // ピッチを設定します
     flutterTts.setVolume(1.0); // ボリュームを設定します
   }
@@ -15,7 +15,7 @@ class TTSNotifier {
 
 // 物体が検知された場合の処理
   onObjectDetected(String objectName, String direction) {
-    String message = "Warning! $objectName detected on your $direction.";
+    String message = "$objectNameが$directionの方向にあります。";
     speak(message);
   }
 }

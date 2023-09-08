@@ -3,7 +3,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/services.dart';
 import 'package:tflite/tflite.dart';
 import 'package:image/image.dart' as img;
-import 'package:flutter_tts/flutter_tts.dart';
+import 'tts_notifier_service.dart';
 
 enum ModelType { YOLO, SSDMobileNet, MobileNet, PoseNet }
 
@@ -131,18 +131,20 @@ class TensorFlowService {
   void checkDetectedObjectSize(
       List<dynamic>? recognitions, int imageWidth, int imageHeight) {
     for (var obj in recognitions!) {
-      if (predefinedSizes.containsKey(obj['detectedClass'])) {
+      var label = obj['detectedClass'];
+      if (predefinedSizes.containsKey(label)) {
         print(
             '---------------checkDetectedObjectSize recognition: $obj.toString()');
-        var predefinedSize = predefinedSizes[obj['detectedClass']];
+        var predefinedSize = predefinedSizes[label];
         var width = obj['rect']['w'] * imageWidth;
         var height = obj['rect']['h'] * imageHeight;
         print(
             '--------------- width: $width height: $height predefinedSize: $predefinedSize');
         if (width > predefinedSize?.width || height > predefinedSize?.height) {
-          print(
-              'Warning: Detected ${obj['detectedClass']} is larger than predefined size!');
+          print('Warning: Detected $label is larger than predefined size!');
           //TODO: 音声で警告を出す
+          var direction = '右斜め前';
+          ttsNotifier.onObjectDetected(label, direction);
         }
       }
     }
