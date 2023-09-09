@@ -41,6 +41,8 @@ dependencies:
   flutter_tts: ^3.2.2
   vibration: ^1.8.1
   audioplayers: ^0.20.1
+  speech_to_text: ^6.3.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

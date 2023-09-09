@@ -1,6 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.hiennv.flutter_realtime_object_detection">
    <uses-permission android:name="android.permission.VIBRATE"/>
+   <uses-permission android:name="android.permission.CAMERA"/>
    <application
         android:label="flutter_realtime_object_detection"
         android:icon="@mipmap/ic_launcher"
