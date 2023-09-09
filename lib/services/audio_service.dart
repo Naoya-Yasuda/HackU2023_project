@@ -1,5 +1,8 @@
 import 'package:audioplayers/audioplayers.dart';
 
+bool isLoading = true; // 真 (true)
+bool isaudio = false;
+
 /*class AudioService {
   final player = AudioCache();
   final AudioPlayer audioPlayer = AudioPlayer();
