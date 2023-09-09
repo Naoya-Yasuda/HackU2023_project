@@ -11,9 +11,6 @@ import 'package:audioplayers/audioplayers.dart';
 late List<CameraDescription> cameras;
 
 Future<void> main() async {
-  final String audioPath = 'assets/audio/dog1b.mp3';
-  final AudioPlayer audioPlayer = AudioPlayer();
-  audioPlayer.play(audioPath, isLocal: true);
   WidgetsFlutterBinding.ensureInitialized();
   cameras = await availableCameras();
   runApp(MultiProvider(

@@ -66,7 +66,10 @@ flutter:
     - assets/models/posenet_mv1_checkpoints.tflite
     - assets/fonts/
     - assets/images/
-    - assets/audio/dog1b.mp3
+    - assets/audios/dog1b.mp3
+    - assets/audios/dog1times.mp3
+    - assets/audios/dog2times.mp3
+    - assets/audios/dog3times.mp3
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
