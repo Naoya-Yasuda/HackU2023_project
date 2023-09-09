@@ -40,7 +40,7 @@ dependencies:
   image: ^3.0.1
   flutter_tts: ^3.2.2
   vibration: ^1.8.1
-
+  audioplayers: ^0.20.1
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -66,6 +66,7 @@ flutter:
     - assets/models/posenet_mv1_checkpoints.tflite
     - assets/fonts/
     - assets/images/
+    - assets/audio/dog1b.mp3
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

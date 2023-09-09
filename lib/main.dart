@@ -6,10 +6,14 @@ import 'package:flutter_realtime_object_detection/services/tensorflow_service.da
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 late List<CameraDescription> cameras;
 
 Future<void> main() async {
+  final String audioPath = 'assets/audio/dog1b.mp3';
+  final AudioPlayer audioPlayer = AudioPlayer();
+  audioPlayer.play(audioPath, isLocal: true);
   WidgetsFlutterBinding.ensureInitialized();
   cameras = await availableCameras();
   runApp(MultiProvider(
