@@ -6,6 +6,9 @@ import 'package:flutter_realtime_object_detection/services/tensorflow_service.da
 import 'package:flutter_realtime_object_detection/view_states/home_view_state.dart';
 import 'package:flutter_realtime_object_detection/services/speech_to_text_service.dart';
 
+bool isLoading = true; // 真 (true)
+bool isaudio = false;
+
 class HomeViewModel extends BaseViewModel<HomeViewState> {
   bool _isDetecting = false;
   bool _isLoadModel = false;
