@@ -19,6 +19,7 @@ Future<void> main() async {
       Provider<TensorFlowService>(create: (_) => TensorFlowService())
     ],
     child: Application(),
+    //child: MyText(),
   ));
 }
 
@@ -40,5 +41,14 @@ class Application extends StatelessWidget {
             ],
           );
         });
+  }
+}
+
+class MyText extends StatelessWidget {
+  MyText({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Text('hoge');
   }
 }

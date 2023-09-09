@@ -1,10 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.hiennv.flutter_realtime_object_detection">
+   <uses-permission android:name="android.permission.VIBRATE"/>
    <application
         android:label="flutter_realtime_object_detection"
         android:icon="@mipmap/ic_launcher"
         android:largeHeap="true">
-        <uses-permission android:name="android.permission.VIBRATE"/>
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
