@@ -80,7 +80,7 @@ class TensorFlowService {
       threshold: 0.2,
       numResultsPerClass: 1,
     );
-    checkDetectedObjectSize(recognitions, image.width, image.height);
+    // checkDetectedObjectSize(recognitions, image.width, image.height);
     return recognitions;
   }
 
@@ -130,7 +130,7 @@ class TensorFlowService {
     return recognitions;
   }
 
-  void checkDetectedObjectSize(
+  List<dynamic>? checkDetectedObjectSize(
       List<dynamic>? recognitions, int imageWidth, int imageHeight) {
     for (var obj in recognitions!) {
       var label = obj['detectedClass'];
@@ -152,9 +152,11 @@ class TensorFlowService {
           } else {
             direction = '目の前';
           }
-          ttsNotifier.onObjectDetected(predefinedObj[label], direction);
+          // ttsNotifier.onObjectDetected(predefinedObj[label], direction);
+          return [predefinedObj[label], direction];
         }
       }
     }
+    return null;
   }
 }
