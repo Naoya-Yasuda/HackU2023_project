@@ -45,7 +45,10 @@ class TTSNotifier {
       print("===============after audio success");
     }
     print("~~~~~~~~~~~~~~~speak success");
-    speak(message);
+    if (isaudio) {
+      speak(message);
+      isaudio = false;
+    }
     print("~~~~~~~~~~~~~~~after speak success");
   }
 }

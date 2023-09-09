@@ -4,12 +4,13 @@ import 'package:flutter/services.dart';
 import 'package:tflite/tflite.dart';
 import 'package:image/image.dart' as img;
 import 'tts_notifier_service.dart';
+import 'audio_service.dart';
 
 enum ModelType { YOLO, SSDMobileNet, MobileNet, PoseNet }
 
 class TensorFlowService {
   ModelType _type = ModelType.YOLO;
-
+  List<dynamic>? _previousRecognitions; //テスト
   ModelType get type => _type;
 
   set type(type) {
@@ -80,6 +81,19 @@ class TensorFlowService {
       numResultsPerClass: 1,
     );
     checkDetectedObjectSize(recognitions, image.width, image.height);
+    //テスト
+    // 追加: 前回の結果と新しい結果を比較
+    if (_previousRecognitions != null &&
+        recognitions.toString() == _previousRecognitions.toString()) {
+      // 前回の結果と同じ場合、何もしない
+      isLoading = false;
+      return null;
+    } else {
+      isLoading = true;
+    }
+
+    _previousRecognitions = recognitions; // 結果を更新
+    //テスト
     return recognitions;
   }
 
