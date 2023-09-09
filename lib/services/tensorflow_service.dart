@@ -67,6 +67,7 @@ class TensorFlowService {
 
   Future<List<dynamic>?> runModelOnFrame(CameraImage image) async {
     List<dynamic>? recognitions = <dynamic>[];
+    // TODO: ご検知対策
     recognitions = await Tflite.detectObjectOnFrame(
       bytesList: image.planes.map((plane) {
         return plane.bytes;

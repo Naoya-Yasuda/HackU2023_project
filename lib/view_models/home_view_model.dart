@@ -4,15 +4,36 @@ import 'package:flutter_realtime_object_detection/app/base/base_view_model.dart'
 import '/models/recognition.dart';
 import 'package:flutter_realtime_object_detection/services/tensorflow_service.dart';
 import 'package:flutter_realtime_object_detection/view_states/home_view_state.dart';
+import 'package:flutter_realtime_object_detection/services/speech_to_text_service.dart';
 
 class HomeViewModel extends BaseViewModel<HomeViewState> {
-  bool _isLoadModel = false;
   bool _isDetecting = false;
+  bool _isLoadModel = false;
+  bool _isListening = false;
 
   late TensorFlowService _tensorFlowService;
 
+  final SpeechToTextService _speechService = SpeechToTextService();
+
+  String? _recognizedText;
+
+  String? get recognizedText => _recognizedText;
   HomeViewModel(BuildContext context, this._tensorFlowService)
       : super(context, HomeViewState(_tensorFlowService.type));
+
+  // New methods for speech recognition
+  Future<void> startListening() async {
+    _isListening = true;
+    await _speechService.startListening();
+  }
+
+  Future<void> stopListening() async {
+    _isListening = false;
+    await _speechService.stopListening();
+    _recognizedText = _speechService.getRecognizedText();
+
+    notifyListeners(); // To update the UI if needed
+  }
 
   Future switchCamera() async {
     state.cameraIndex = state.cameraIndex == 0 ? 1 : 0;
@@ -28,6 +49,7 @@ class HomeViewModel extends BaseViewModel<HomeViewState> {
   }
 
   Future<void> runModel(CameraImage cameraImage) async {
+    print('---- cameraImage -----:' + cameraImage.toString());
     if (_isLoadModel && mounted) {
       if (!this._isDetecting && mounted) {
         this._isDetecting = true;
@@ -41,6 +63,7 @@ class HomeViewModel extends BaseViewModel<HomeViewState> {
               recognitions.map((model) => Recognition.fromJson(model)));
           state.widthImage = cameraImage.width;
           state.heightImage = cameraImage.height;
+          print('---- state -----:' + recognitions.toString());
           notifyListeners();
         }
         this._isDetecting = false;
