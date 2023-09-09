@@ -42,7 +42,7 @@ class TTSNotifier {
       print("=================audio success");
       Vibration.vibrate(duration: duration);
       await audioService.playSound(0);
-      print("===============audio success");
+      print("===============after audio success");
     }
     print("~~~~~~~~~~~~~~~speak success");
     speak(message);
