@@ -87,17 +87,6 @@ class TensorFlowService {
       numResultsPerClass: 1,
     );
     // checkDetectedObjectSize(recognitions, image.width, image.height);
-    // 追加: 前回の結果と新しい結果を比較
-    if (_previousRecognitions != null &&
-        recognitions.toString() == _previousRecognitions.toString()) {
-      // 前回の結果と同じ場合、何もしない
-      isLoading = false;
-      return null;
-    } else {
-      isLoading = true;
-    }
-
-    _previousRecognitions = recognitions; // 結果を更新
 
     return recognitions;
   }
@@ -174,5 +163,16 @@ class TensorFlowService {
         }
       }
     }
+    // 前回の結果と新しい結果を比較
+    if (_previousRecognitions != null &&
+        recognitions.toString() == _previousRecognitions.toString()) {
+      // 前回の結果と同じ場合、何もしない
+      isLoading = false;
+      return null;
+    } else {
+      isLoading = true;
+    }
+
+    _previousRecognitions = recognitions; // 結果を更新
   }
 }
