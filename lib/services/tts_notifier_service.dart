@@ -39,16 +39,12 @@ class TTSNotifier {
       duration = 1000;
     }
     if (!isCurrentlySpeaking) {
-      print("=================audio success");
       Vibration.vibrate(duration: duration);
       await audioService.playSound(0);
-      print("===============after audio success");
     }
-    print("~~~~~~~~~~~~~~~speak success");
     if (isaudio) {
       speak(message);
       isaudio = false;
     }
-    print("~~~~~~~~~~~~~~~after speak success");
   }
 }

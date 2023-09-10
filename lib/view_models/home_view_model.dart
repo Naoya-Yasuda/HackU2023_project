@@ -18,8 +18,16 @@ class HomeViewModel extends BaseViewModel<HomeViewState> {
   String? _targetKeyword;
 
   String? get recognizedText => _targetKeyword;
+
+  // コンストラクタ※インスタンス化された時に呼ばれる
   HomeViewModel(BuildContext context, this._tensorFlowService)
-      : super(context, HomeViewState(_tensorFlowService.type));
+      : super(context, HomeViewState(_tensorFlowService.type)) {
+    _initializeSpeech();
+  }
+
+  void _initializeSpeech() async {
+    await _speechService.initialize();
+  }
 
   // New methods for speech recognition
   Future<void> startListening() async {
@@ -52,7 +60,6 @@ class HomeViewModel extends BaseViewModel<HomeViewState> {
   }
 
   Future<void> runModel(CameraImage cameraImage) async {
-    print('---- cameraImage -----:' + cameraImage.toString());
     if (_isLoadModel && mounted) {
       if (!this._isDetecting && mounted) {
         this._isDetecting = true;

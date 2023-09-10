@@ -69,6 +69,6 @@ class SpeechToTextService {
   }
 
   void _onError(dynamic error) {
-    // Handle the error appropriately
+    print("Error in speech recognition: $error");
   }
 }
