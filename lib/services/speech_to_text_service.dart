@@ -42,8 +42,9 @@ class SpeechToTextService {
   }
 
   String? _onResult(SpeechRecognitionResult result) {
-    print('--------- _onResult1:');
+    print('--------- _onResult0:');
     _recognizedText = result.recognizedWords;
+    print('--------- _onResult1 _recognizedText:' + _recognizedText!);
     final RegExp pattern = RegExp(r'(.+?)を探して');
     final Match? match = pattern.firstMatch(_recognizedText!);
     final supportedKeywords = ['椅子', '人間', 'キーボード'];
