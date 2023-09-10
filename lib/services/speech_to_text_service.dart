@@ -21,18 +21,13 @@ class SpeechToTextService {
   }
 
   Future<void> startListening() async {
-    print('--------- SpeechToTextService.startListening1:');
-
     if (!_isListening) {
-      print('--------- SpeechToTextService.startListening2:');
       _speech.listen(onResult: _onResult, localeId: 'ja_JP');
     }
   }
 
   Future<void> stopListening() async {
-    print('--------- SpeechToTextService.stopListening1:');
     if (_isListening) {
-      print('--------- SpeechToTextService.stopListening2:');
       _speech.stop();
     }
   }
@@ -48,17 +43,7 @@ class SpeechToTextService {
     final RegExp pattern = RegExp(r'(.+?)を探して');
     final Match? match = pattern.firstMatch(_recognizedText!);
     final supportedKeywords = [
-      'isu',
-      'hito',
-      'kibodo',
-      'neko',
-      'sumaho',
-      'tsukue',
-      'uma',
-      'wain',
-      'yagi',
-      'bas',
-      'basu'
+      '椅子',
     ];
 
     if (match != null && match.groupCount > 0) {

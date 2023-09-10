@@ -18,6 +18,7 @@ class TensorFlowService {
   }
 
   // 事前に定義された各ラベルのサイズの閾値
+  // TODO: resource.dartに移動予定
   Map<String, List<dynamic>> predefinedObj = {
     'person': ['人間', Size(640, 360)],
     'chair': ['椅子', Size(300, 150)],
@@ -82,7 +83,6 @@ class TensorFlowService {
       numResultsPerClass: 1,
     );
     checkDetectedObjectSize(recognitions, image.width, image.height);
-    //テスト
     // 追加: 前回の結果と新しい結果を比較
     if (_previousRecognitions != null &&
         recognitions.toString() == _previousRecognitions.toString()) {
@@ -94,7 +94,7 @@ class TensorFlowService {
     }
 
     _previousRecognitions = recognitions; // 結果を更新
-    //テスト
+
     return recognitions;
   }
 

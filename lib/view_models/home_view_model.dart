@@ -15,9 +15,7 @@ class HomeViewModel extends BaseViewModel<HomeViewState> {
 
   final SpeechToTextService _speechService = SpeechToTextService();
 
-  String? _targetKeyword;
-
-  String? get recognizedText => _targetKeyword;
+  String? get recognizedText => targetKeyword;
 
   // コンストラクタ※インスタンス化された時に呼ばれる
   HomeViewModel(BuildContext context, this._tensorFlowService)
@@ -40,8 +38,8 @@ class HomeViewModel extends BaseViewModel<HomeViewState> {
     print('--------- HomeViewModel.stopListening:');
     _isListening = false;
     await _speechService.stopListening();
-    _targetKeyword = _speechService.getRecognizedText();
-    print('_targetKeyword:' + _targetKeyword!);
+    targetKeyword = _speechService.getRecognizedText()!;
+    print('_targetKeyword:' + targetKeyword!);
     // TODO: 目標が検知されたら、音声を再生する
     notifyListeners(); // To update the UI if needed
   }

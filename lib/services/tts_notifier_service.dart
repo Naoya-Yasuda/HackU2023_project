@@ -1,13 +1,14 @@
+import 'package:flutter_realtime_object_detection/view_models/home_view_model.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:vibration/vibration.dart';
 import 'audio_service.dart';
-import 'package:audioplayers/audioplayers.dart';
 
 class TTSNotifier {
   final FlutterTts flutterTts = FlutterTts();
   bool isCurrentlySpeaking = false;
+  final HomeViewModel viewModel;
 
-  TTSNotifier() {
+  TTSNotifier(this.viewModel) {
     flutterTts.setLanguage("ja-JP");
     flutterTts.setPitch(1.0);
     flutterTts.setVolume(1.0);
@@ -25,19 +26,26 @@ class TTSNotifier {
 
   Future<void> onObjectDetected(dynamic object, String direction) async {
     final audioService = AudioService();
+    var objJpLabel = object[0];
     var objSize = object[1];
     String message;
     var duration;
-    if (objSize.width > 500 && objSize.height > 300) {
-      message = "危険です。${object[0]}が$directionの方向にあります。避けて下さい。";
-      duration = 5000;
-    } else if (objSize.width >= 300 && objSize.height >= 150) {
-      message = "${object[0]}が$directionの方向にあります。気を付けて下さい。";
-      duration = 3000;
+    //目標検知モードかつ検知したオブジェクトが目標の場合
+    if (objJpLabel == viewModel.targetKeyword) {
+      message = "目標に到達しました。$objJpLabelが$directionの方向にあります。";
     } else {
-      message = "${object[0]}が$directionの方向にあります。";
-      duration = 1000;
+      if (objSize.width > 500 && objSize.height > 300) {
+        message = "危険です。$objJpLabelが$directionの方向にあります。避けて下さい。";
+        duration = 5000;
+      } else if (objSize.width >= 300 && objSize.height >= 150) {
+        message = "$objJpLabelが$directionの方向にあります。気を付けて下さい。";
+        duration = 3000;
+      } else {
+        message = "$objJpLabelが$directionの方向にあります。";
+        duration = 1000;
+      }
     }
+
     if (!isCurrentlySpeaking) {
       Vibration.vibrate(duration: duration);
       await audioService.playSound(0);

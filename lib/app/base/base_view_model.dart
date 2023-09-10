@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 abstract class BaseViewModel<T> with ChangeNotifier {
-
   bool _mounted = true;
 
   BuildContext _context;
@@ -14,10 +13,18 @@ abstract class BaseViewModel<T> with ChangeNotifier {
 
   bool get isLoading => _isLoading;
 
+  String _targetKeyword = "";
+
+  String get targetKeyword => _targetKeyword;
+
+  set targetKeyword(String keyword) {
+    _targetKeyword = keyword;
+  }
+
   T get state => _state;
 
   set isLoading(bool isLoading) {
-    if(_isLoading != isLoading){
+    if (_isLoading != isLoading) {
       _isLoading = isLoading;
       this.notifyListeners();
     }
