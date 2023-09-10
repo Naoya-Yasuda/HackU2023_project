@@ -1,11 +1,14 @@
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:speech_to_text/speech_recognition_result.dart';
+import 'tts_notifier_service.dart';
 
 class SpeechToTextService {
   final stt.SpeechToText _speech = stt.SpeechToText();
 
   bool _isListening = false;
   String? _recognizedText;
+
+  TTSNotifier tTSNotifier = TTSNotifier();
 
   Future<void> initialize() async {
     bool available = await _speech.initialize(
@@ -43,6 +46,8 @@ class SpeechToTextService {
       String keyword = match.group(1)!; // 抜き出されたキーワード
 
       if (supportedKeywords.contains(keyword)) {
+        final message = '$keywordを探します';
+        tTSNotifier.speak(message);
         // このキーワードを目標として設定
         return keyword;
       }

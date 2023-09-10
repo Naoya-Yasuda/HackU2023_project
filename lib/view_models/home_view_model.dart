@@ -15,9 +15,9 @@ class HomeViewModel extends BaseViewModel<HomeViewState> {
 
   final SpeechToTextService _speechService = SpeechToTextService();
 
-  String? _recognizedText;
+  String? _targetKeyword;
 
-  String? get recognizedText => _recognizedText;
+  String? get recognizedText => _targetKeyword;
   HomeViewModel(BuildContext context, this._tensorFlowService)
       : super(context, HomeViewState(_tensorFlowService.type));
 
@@ -30,8 +30,9 @@ class HomeViewModel extends BaseViewModel<HomeViewState> {
   Future<void> stopListening() async {
     _isListening = false;
     await _speechService.stopListening();
-    _recognizedText = _speechService.getRecognizedText();
-
+    _targetKeyword = _speechService.getRecognizedText();
+    print(_targetKeyword);
+    // TODO: 目標が検知されたら、音声を再生する
     notifyListeners(); // To update the UI if needed
   }
 
