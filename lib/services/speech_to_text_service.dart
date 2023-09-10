@@ -25,7 +25,7 @@ class SpeechToTextService {
 
     if (!_isListening) {
       print('--------- SpeechToTextService.startListening2:');
-      _speech.listen(onResult: _onResult);
+      _speech.listen(onResult: _onResult, localeId: 'ja_JP');
     }
   }
 
