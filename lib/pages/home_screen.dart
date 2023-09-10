@@ -66,6 +66,7 @@ class _HomeScreenState extends BaseStateful<HomeScreen, HomeViewModel>
         return;
       }
       _cameraController.setFlashMode(FlashMode.off);
+
       /// TODO: Run Model
       setState(() {});
       _cameraController.startImageStream((image) async {
@@ -177,7 +178,8 @@ class _HomeScreenState extends BaseStateful<HomeScreen, HomeViewModel>
   }
 
   Future<bool> renderedAndSaveImage(Uint8List draw, XFile camera) async {
-    UI.Image cameraImage = await decodeImageFromList(await camera.readAsBytes());
+    UI.Image cameraImage =
+        await decodeImageFromList(await camera.readAsBytes());
 
     UI.Codec codec = await UI.instantiateImageCodec(draw);
     var detectionImage = (await codec.getNextFrame()).image;
@@ -201,12 +203,13 @@ class _HomeScreenState extends BaseStateful<HomeScreen, HomeViewModel>
         recorder,
         Rect.fromPoints(
             new Offset(0.0, 0.0),
-            new Offset(cameraImage.width.toDouble(),
-                cameraImage.height.toDouble())));
+            new Offset(
+                cameraImage.width.toDouble(), cameraImage.height.toDouble())));
 
     canvas.drawImage(cameraImage, Offset.zero, Paint());
 
-    codec = await UI.instantiateImageCodec(draw, targetWidth: scaleWidth.toInt(), targetHeight: scaleHeight.toInt());
+    codec = await UI.instantiateImageCodec(draw,
+        targetWidth: scaleWidth.toInt(), targetHeight: scaleHeight.toInt());
     detectionImage = (await codec.getNextFrame()).image;
 
     canvas.drawImage(detectionImage, Offset(difW.abs(), difH.abs()), Paint());
@@ -220,7 +223,8 @@ class _HomeScreenState extends BaseStateful<HomeScreen, HomeViewModel>
 
     final pngBytes = await img.toByteData(format: UI.ImageByteFormat.png);
 
-    final result2 = await ImageGallerySaver.saveImage(Uint8List.view(pngBytes!.buffer),
+    final result2 = await ImageGallerySaver.saveImage(
+        Uint8List.view(pngBytes!.buffer),
         quality: 100,
         name: 'realtime_object_detection_${DateTime.now()}');
     print(result2);
@@ -344,62 +348,72 @@ class _HomeScreenState extends BaseStateful<HomeScreen, HomeViewModel>
         screenRatio > previewRatio ? screenHeight : screenWidth * previewRatio;
     final maxWidth =
         screenRatio > previewRatio ? screenHeight / previewRatio : screenWidth;
-
-    return Container(
-        height: MediaQuery.of(context).size.height,
-        width: double.infinity,
-        color: Colors.grey.shade900,
-        child: Padding(
-          padding: const EdgeInsets.all(10),
-          child: Container(
-              width: MediaQuery.of(context).size.width,
-              child: Screenshot(
-                  controller: screenshotController,
-                  child: Stack(
-                    children: <Widget>[
-                      OverflowBox(
-                        maxHeight: maxHeight,
-                        maxWidth: maxWidth,
-                        child: FutureBuilder<void>(
-                            future: _initializeControllerFuture,
-                            builder: (_, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.done) {
-                                return CameraPreview(_cameraController);
-                              } else {
-                                return const Center(
-                                    child: CircularProgressIndicator(
-                                        color: AppColors.blue));
-                              }
-                            }),
-                      ),
-                      Consumer<HomeViewModel>(builder: (_, homeViewModel, __) {
-                        return ConfidenceWidget(
-                          heightAppBar: heightAppBar,
-                          entities: homeViewModel.state.recognitions,
-                          previewHeight: max(homeViewModel.state.heightImage,
-                              homeViewModel.state.widthImage),
-                          previewWidth: min(homeViewModel.state.heightImage,
-                              homeViewModel.state.widthImage),
-                          screenWidth: MediaQuery.of(context).size.width,
-                          screenHeight: MediaQuery.of(context).size.height,
-                          type: homeViewModel.state.type,
-                        );
-                      }),
-                      OverflowBox(
-                        maxHeight: maxHeight,
-                        maxWidth: maxWidth,
-                        child: ApertureWidget(
-                          apertureController: apertureController,
+    return GestureDetector(
+      onPanDown: (details) {
+        // タッチを開始したときの処理
+        viewModel.startListening();
+      },
+      onPanEnd: (details) {
+        // タッチを終了したときの処理
+        viewModel.stopListening();
+      },
+      child: Container(
+          height: MediaQuery.of(context).size.height,
+          width: double.infinity,
+          color: Colors.grey.shade900,
+          child: Padding(
+            padding: const EdgeInsets.all(10),
+            child: Container(
+                width: MediaQuery.of(context).size.width,
+                child: Screenshot(
+                    controller: screenshotController,
+                    child: Stack(
+                      children: <Widget>[
+                        OverflowBox(
+                          maxHeight: maxHeight,
+                          maxWidth: maxWidth,
+                          child: FutureBuilder<void>(
+                              future: _initializeControllerFuture,
+                              builder: (_, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.done) {
+                                  return CameraPreview(_cameraController);
+                                } else {
+                                  return const Center(
+                                      child: CircularProgressIndicator(
+                                          color: AppColors.blue));
+                                }
+                              }),
                         ),
-                      ),
-                      // Container(
-                      //   decoration: BoxDecoration(
-                      //     border: Border.all(color: Colors.red, width: 2)
-                      //   ),
-                      // )
-                    ],
-                  ))),
-        ));
+                        Consumer<HomeViewModel>(
+                            builder: (_, homeViewModel, __) {
+                          return ConfidenceWidget(
+                            heightAppBar: heightAppBar,
+                            entities: homeViewModel.state.recognitions,
+                            previewHeight: max(homeViewModel.state.heightImage,
+                                homeViewModel.state.widthImage),
+                            previewWidth: min(homeViewModel.state.heightImage,
+                                homeViewModel.state.widthImage),
+                            screenWidth: MediaQuery.of(context).size.width,
+                            screenHeight: MediaQuery.of(context).size.height,
+                            type: homeViewModel.state.type,
+                          );
+                        }),
+                        OverflowBox(
+                          maxHeight: maxHeight,
+                          maxWidth: maxWidth,
+                          child: ApertureWidget(
+                            apertureController: apertureController,
+                          ),
+                        ),
+                        // Container(
+                        //   decoration: BoxDecoration(
+                        //     border: Border.all(color: Colors.red, width: 2)
+                        //   ),
+                        // )
+                      ],
+                    ))),
+          )),
+    );
   }
 }
