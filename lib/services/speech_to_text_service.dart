@@ -8,11 +8,9 @@ class SpeechToTextService {
   bool _isListening = false;
   String _recognizedText = '';
 
-  SpeechToTextService(String targetKeyword) {
-    this._recognizedText = targetKeyword;
-  }
+  SpeechToTextService(String targetKeyword);
   // 消してhomeViewModelで使う予定
-  late final TTSNotifier tTSNotifier = TTSNotifier(_recognizedText); // lateを使う
+  late final TTSNotifier tTSNotifier = TTSNotifier(); // lateを使う
 
   Future<void> initialize() async {
     bool available = await _speech.initialize(

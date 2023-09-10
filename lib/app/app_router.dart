@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-// TODO: インポートパスを変える？
+// TODO: インポートパスを変える？アプリ名決めたら変えます
 import 'package:flutter_realtime_object_detection/pages/home_screen.dart';
 import 'package:flutter_realtime_object_detection/pages/local_screen.dart';
 import 'package:flutter_realtime_object_detection/pages/splash_screen.dart';

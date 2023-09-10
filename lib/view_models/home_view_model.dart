@@ -23,7 +23,7 @@ class HomeViewModel extends BaseViewModel<HomeViewState> {
   HomeViewModel(BuildContext context, this._tensorFlowService)
       : super(context, HomeViewState(_tensorFlowService.type)) {
     _speechService = SpeechToTextService(super.targetKeyword);
-    _ttsNotifier = TTSNotifier(super.targetKeyword);
+    _ttsNotifier = TTSNotifier();
     _initializeSpeech();
   }
 
@@ -69,6 +69,7 @@ class HomeViewModel extends BaseViewModel<HomeViewState> {
         var recognitions =
             await this._tensorFlowService.runModelOnFrame(cameraImage);
         final noticeFunction = this._ttsNotifier.onObjectDetected;
+        print('runModel targetKeyword:' + targetKeyword);
         this._tensorFlowService.checkDetectedObjectSize(
             recognitions,
             cameraImage.width,

@@ -5,11 +5,8 @@ import 'audio_service.dart';
 class TTSNotifier {
   final FlutterTts flutterTts = FlutterTts();
   bool isCurrentlySpeaking = false;
-  //TODO: 削除予定
-  String _targetKeyword = '';
 
-  TTSNotifier(String targetKeyword) {
-    this._targetKeyword = targetKeyword;
+  TTSNotifier() {
     flutterTts.setLanguage("ja-JP");
     flutterTts.setPitch(1.0);
     flutterTts.setVolume(1.0);
@@ -22,6 +19,7 @@ class TTSNotifier {
     if (!isCurrentlySpeaking) {
       isCurrentlySpeaking = true;
       await flutterTts.speak(message);
+      isCurrentlySpeaking = false;
     }
   }
 
