@@ -22,12 +22,13 @@ class HomeViewModel extends BaseViewModel<HomeViewState> {
   // コンストラクタ※インスタンス化された時に呼ばれる
   HomeViewModel(BuildContext context, this._tensorFlowService)
       : super(context, HomeViewState(_tensorFlowService.type)) {
-    _initializeSpeech();
-
+    _speechService = SpeechToTextService(targetKeyword);
     _speechService.onKeywordDetected = (keyword) {
       targetKeyword = keyword; // BaseViewModelのtargetKeywordにセット
       notifyListeners(); // UIの更新
     };
+
+    _initializeSpeech();
   }
 
   void _initializeSpeech() async {
