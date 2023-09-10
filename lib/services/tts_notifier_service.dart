@@ -25,15 +25,19 @@ class TTSNotifier {
   }
 
   Future<void> onObjectDetected(dynamic object, String direction) async {
+    print('onObjectDetected start');
     final audioService = AudioService();
     var objJpLabel = object[0];
     var objSize = object[1];
     String message;
     var duration;
+    print('objJpLabel:$objJpLabel _targetKeyword: $_targetKeyword');
     //目標検知モードかつ検知したオブジェクトが目標の場合
     if (objJpLabel == _targetKeyword) {
+      print('objJpLabel2:$objJpLabel _targetKeyword2: $_targetKeyword');
       message = "目標に到達しました。$objJpLabelが$directionの方向にあります。";
     } else {
+      print('else onObjectDetected');
       if (objSize.width > 500 && objSize.height > 300) {
         message = "危険です。$objJpLabelが$directionの方向にあります。避けて下さい。";
         duration = 5000;
@@ -45,11 +49,12 @@ class TTSNotifier {
         duration = 1000;
       }
     }
-
+    print('isCurrentlySpeaking:' + isCurrentlySpeaking.toString());
     if (!isCurrentlySpeaking) {
       Vibration.vibrate(duration: duration);
       await audioService.playSound(0);
     }
+    print('isaudio:' + isaudio.toString());
     if (isaudio) {
       speak(message);
       isaudio = false;

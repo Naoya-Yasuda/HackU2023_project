@@ -40,7 +40,10 @@ class AppTextStyles {
 
   //Regular
   static TextStyle regularTextStyle(
-          {double? fontSize, Color? color, double? height, Color? backgroundColor}) =>
+          {double? fontSize,
+          Color? color,
+          double? height,
+          Color? backgroundColor}) =>
       TextStyle(
           fontFamily: AppFonts.fontRoboto,
           fontWeight: FontWeight.w300,
@@ -51,7 +54,10 @@ class AppTextStyles {
 
   //Medium
   static TextStyle mediumTextStyle(
-          {double? fontSize, Color? color, double? height, Color? backgroundColor}) =>
+          {double? fontSize,
+          Color? color,
+          double? height,
+          Color? backgroundColor}) =>
       TextStyle(
           fontFamily: AppFonts.fontRoboto,
           fontSize: fontSize ?? AppFontSizes.medium,
@@ -62,7 +68,10 @@ class AppTextStyles {
 
   //Bold
   static TextStyle boldTextStyle(
-      {double? fontSize, Color? color, double? height, Color? backgroundColor}) =>
+          {double? fontSize,
+          Color? color,
+          double? height,
+          Color? backgroundColor}) =>
       TextStyle(
           fontFamily: AppFonts.fontRoboto,
           fontSize: fontSize ?? AppFontSizes.medium,
@@ -81,6 +90,7 @@ class AppImages {
 class AppStrings {
   AppStrings._();
 
-  static const title = 'Realtime Object Detection';
-  static const urlRepo = 'https://github.com/hiennguyen92/flutter_realtime_object_detection';
+  static const title = '盲導犬アプリ';
+  static const urlRepo =
+      'https://github.com/hiennguyen92/flutter_realtime_object_detection';
 }
