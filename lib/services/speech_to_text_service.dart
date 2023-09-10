@@ -47,7 +47,19 @@ class SpeechToTextService {
     print('--------- _onResult1 _recognizedText:' + _recognizedText!);
     final RegExp pattern = RegExp(r'(.+?)を探して');
     final Match? match = pattern.firstMatch(_recognizedText!);
-    final supportedKeywords = ['椅子', '人間', 'キーボード'];
+    final supportedKeywords = [
+      'isu',
+      'hito',
+      'kibodo',
+      'neko',
+      'sumaho',
+      'tsukue',
+      'uma',
+      'wain',
+      'yagi',
+      'bas',
+      'basu'
+    ];
 
     if (match != null && match.groupCount > 0) {
       String keyword = match.group(1)!; // 抜き出されたキーワード
