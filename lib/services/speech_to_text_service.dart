@@ -21,13 +21,18 @@ class SpeechToTextService {
   }
 
   Future<void> startListening() async {
+    print('--------- SpeechToTextService.startListening1:');
+
     if (!_isListening) {
+      print('--------- SpeechToTextService.startListening2:');
       _speech.listen(onResult: _onResult);
     }
   }
 
   Future<void> stopListening() async {
+    print('--------- SpeechToTextService.stopListening1:');
     if (_isListening) {
+      print('--------- SpeechToTextService.stopListening2:');
       _speech.stop();
     }
   }
@@ -37,6 +42,7 @@ class SpeechToTextService {
   }
 
   String? _onResult(SpeechRecognitionResult result) {
+    print('--------- _onResult1:');
     _recognizedText = result.recognizedWords;
     final RegExp pattern = RegExp(r'(.+?)を探して');
     final Match? match = pattern.firstMatch(_recognizedText!);
@@ -44,14 +50,17 @@ class SpeechToTextService {
 
     if (match != null && match.groupCount > 0) {
       String keyword = match.group(1)!; // 抜き出されたキーワード
+      print('--------- _onResult2:' + keyword);
 
       if (supportedKeywords.contains(keyword)) {
+        print('--------- _onResult3:' + keyword);
         final message = '$keywordを探します';
         tTSNotifier.speak(message);
         // このキーワードを目標として設定
         return keyword;
       }
     }
+    print('--------- _onResult4:');
     return null;
   }
 

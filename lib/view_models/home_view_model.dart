@@ -23,15 +23,17 @@ class HomeViewModel extends BaseViewModel<HomeViewState> {
 
   // New methods for speech recognition
   Future<void> startListening() async {
+    print('--------- HomeViewModel.startListening:');
     _isListening = true;
     await _speechService.startListening();
   }
 
   Future<void> stopListening() async {
+    print('--------- HomeViewModel.stopListening:');
     _isListening = false;
     await _speechService.stopListening();
     _targetKeyword = _speechService.getRecognizedText();
-    print(_targetKeyword);
+    print('_targetKeyword:' + _targetKeyword!);
     // TODO: 目標が検知されたら、音声を再生する
     notifyListeners(); // To update the UI if needed
   }
