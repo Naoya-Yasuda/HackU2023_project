@@ -3,7 +3,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/services.dart';
 import 'package:tflite/tflite.dart';
 import 'package:image/image.dart' as img;
-import 'tts_notifier_service.dart';
+// import 'tts_notifier_service.dart';
 import 'audio_service.dart';
 
 enum ModelType { YOLO, SSDMobileNet, MobileNet, PoseNet }
@@ -12,6 +12,12 @@ class TensorFlowService {
   ModelType _type = ModelType.YOLO;
   List<dynamic>? _previousRecognitions; //テスト
   ModelType get type => _type;
+  // String _targetKeyword = '';
+  // TensorFlowService(String targetKeyword) {
+  //   this._targetKeyword = targetKeyword;
+  // }
+
+  // late final TTSNotifier ttsNotifier = TTSNotifier(_targetKeyword); // lateを使う
 
   set type(type) {
     _type = type;
@@ -25,8 +31,6 @@ class TensorFlowService {
     'keyboard': ['キーボード', Size(40, 70)],
     // 他のラベルとサイズを追加できます
   };
-
-  final ttsNotifier = TTSNotifier();
 
   loadModel(ModelType type) async {
     try {
@@ -82,7 +86,7 @@ class TensorFlowService {
       threshold: 0.2,
       numResultsPerClass: 1,
     );
-    checkDetectedObjectSize(recognitions, image.width, image.height);
+    // checkDetectedObjectSize(recognitions, image.width, image.height);
     // 追加: 前回の結果と新しい結果を比較
     if (_previousRecognitions != null &&
         recognitions.toString() == _previousRecognitions.toString()) {
@@ -144,8 +148,8 @@ class TensorFlowService {
     return recognitions;
   }
 
-  void checkDetectedObjectSize(
-      List<dynamic>? recognitions, int imageWidth, int imageHeight) {
+  void checkDetectedObjectSize(List<dynamic>? recognitions, int imageWidth,
+      int imageHeight, Function noticeFunction) {
     for (var obj in recognitions!) {
       var label = obj['detectedClass'];
       if (predefinedObj.containsKey(label)) {
@@ -166,7 +170,7 @@ class TensorFlowService {
           } else {
             direction = '目の前';
           }
-          ttsNotifier.onObjectDetected(predefinedObj[label], direction);
+          noticeFunction(predefinedObj[label], direction);
         }
       }
     }

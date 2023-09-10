@@ -1,4 +1,3 @@
-import 'package:flutter_realtime_object_detection/view_models/home_view_model.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:vibration/vibration.dart';
 import 'audio_service.dart';
@@ -6,9 +5,10 @@ import 'audio_service.dart';
 class TTSNotifier {
   final FlutterTts flutterTts = FlutterTts();
   bool isCurrentlySpeaking = false;
-  final HomeViewModel viewModel;
+  String _targetKeyword = '';
 
-  TTSNotifier(this.viewModel) {
+  TTSNotifier(String targetKeyword) {
+    this._targetKeyword = targetKeyword;
     flutterTts.setLanguage("ja-JP");
     flutterTts.setPitch(1.0);
     flutterTts.setVolume(1.0);
@@ -31,7 +31,7 @@ class TTSNotifier {
     String message;
     var duration;
     //目標検知モードかつ検知したオブジェクトが目標の場合
-    if (objJpLabel == viewModel.targetKeyword) {
+    if (objJpLabel == _targetKeyword) {
       message = "目標に到達しました。$objJpLabelが$directionの方向にあります。";
     } else {
       if (objSize.width > 500 && objSize.height > 300) {

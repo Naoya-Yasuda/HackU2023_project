@@ -1,6 +1,7 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_realtime_object_detection/app/base/base_view_model.dart';
+import '../services/tts_notifier_service.dart';
 import '/models/recognition.dart';
 import 'package:flutter_realtime_object_detection/services/tensorflow_service.dart';
 import 'package:flutter_realtime_object_detection/view_states/home_view_state.dart';
@@ -13,13 +14,16 @@ class HomeViewModel extends BaseViewModel<HomeViewState> {
 
   late TensorFlowService _tensorFlowService;
 
-  final SpeechToTextService _speechService = SpeechToTextService();
-
   String? get recognizedText => targetKeyword;
+
+  late SpeechToTextService _speechService;
+  late TTSNotifier _ttsNotifier;
 
   // コンストラクタ※インスタンス化された時に呼ばれる
   HomeViewModel(BuildContext context, this._tensorFlowService)
       : super(context, HomeViewState(_tensorFlowService.type)) {
+    _speechService = SpeechToTextService(super.targetKeyword);
+    _ttsNotifier = TTSNotifier(super.targetKeyword);
     _initializeSpeech();
   }
 
@@ -64,6 +68,9 @@ class HomeViewModel extends BaseViewModel<HomeViewState> {
         int startTime = new DateTime.now().millisecondsSinceEpoch;
         var recognitions =
             await this._tensorFlowService.runModelOnFrame(cameraImage);
+        final noticeFunction = this._ttsNotifier.onObjectDetected;
+        this._tensorFlowService.checkDetectedObjectSize(recognitions,
+            cameraImage.width, cameraImage.height, noticeFunction);
         int endTime = new DateTime.now().millisecondsSinceEpoch;
         print('Time detection: ${endTime - startTime}');
         if (recognitions != null && mounted) {
