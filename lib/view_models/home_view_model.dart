@@ -13,8 +13,8 @@ class HomeViewModel extends BaseViewModel<HomeViewState> {
   bool _isListening = false;
 
   late TensorFlowService _tensorFlowService;
-
-  String? get recognizedText => targetKeyword;
+  String _recognizedText = "";
+  // String? get recognizedText => targetKeyword;
 
   late SpeechToTextService _speechService;
   late TTSNotifier _ttsNotifier;
@@ -42,8 +42,8 @@ class HomeViewModel extends BaseViewModel<HomeViewState> {
     print('--------- HomeViewModel.stopListening:');
     _isListening = false;
     await _speechService.stopListening();
-    targetKeyword = _speechService.getRecognizedText()!;
-    print('_targetKeyword:' + targetKeyword!);
+    _recognizedText = _speechService.getRecognizedText()!;
+    print('_recognizedText:' + _recognizedText!);
     // TODO: 目標が検知されたら、音声を再生する
     notifyListeners(); // To update the UI if needed
   }

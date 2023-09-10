@@ -46,6 +46,9 @@ class SpeechToTextService {
     final Match? match = pattern.firstMatch(_recognizedText!);
     final supportedKeywords = [
       '椅子',
+      '人間',
+      '人',
+      'キーボード',
     ];
 
     if (match != null && match.groupCount > 0) {
