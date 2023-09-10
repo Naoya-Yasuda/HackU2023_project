@@ -138,7 +138,7 @@ class TensorFlowService {
   }
 
   void checkDetectedObjectSize(List<dynamic>? recognitions, int imageWidth,
-      int imageHeight, Function noticeFunction) {
+      int imageHeight, Function noticeFunction, String targetKeyword) {
     for (var obj in recognitions!) {
       var label = obj['detectedClass'];
       if (predefinedObj.containsKey(label)) {
@@ -159,7 +159,7 @@ class TensorFlowService {
           } else {
             direction = '目の前';
           }
-          noticeFunction(predefinedObj[label], direction);
+          noticeFunction(predefinedObj[label], direction, targetKeyword);
         }
       }
     }

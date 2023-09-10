@@ -5,6 +5,7 @@ import 'audio_service.dart';
 class TTSNotifier {
   final FlutterTts flutterTts = FlutterTts();
   bool isCurrentlySpeaking = false;
+  //TODO: 削除予定
   String _targetKeyword = '';
 
   TTSNotifier(String targetKeyword) {
@@ -24,17 +25,18 @@ class TTSNotifier {
     }
   }
 
-  Future<void> onObjectDetected(dynamic object, String direction) async {
+  Future<void> onObjectDetected(
+      dynamic object, String direction, String targetKeyword) async {
     print('onObjectDetected start');
     final audioService = AudioService();
     var objJpLabel = object[0];
     var objSize = object[1];
     String message;
     var duration;
-    print('objJpLabel:$objJpLabel _targetKeyword: $_targetKeyword');
+    print('objJpLabel:$objJpLabel targetKeyword: $targetKeyword');
     //目標検知モードかつ検知したオブジェクトが目標の場合
-    if (objJpLabel == _targetKeyword) {
-      print('objJpLabel2:$objJpLabel _targetKeyword2: $_targetKeyword');
+    if (objJpLabel == targetKeyword) {
+      print('objJpLabel2:$objJpLabel targetKeyword2: $targetKeyword');
       message = "目標に到達しました。$objJpLabelが$directionの方向にあります。";
     } else {
       print('else onObjectDetected');
