@@ -8,6 +8,7 @@ class AudioService {
   final player = AudioCache();
   final AudioPlayer audioPlayer = AudioPlayer();
   Future<void> playSound(num type) async {
+    // TODO: リファクタリング
     if (type == 0 && isLoading) {
       await player.play('audios/dog1b.mp3');
       await Future.delayed(Duration(milliseconds: 1300), () {
