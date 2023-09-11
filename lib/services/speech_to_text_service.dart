@@ -12,8 +12,6 @@ class SpeechToTextService {
   // 消してhomeViewModelで使う予定
   late final TTSNotifier tTSNotifier = TTSNotifier(); // lateを使う
 
-  Function(String)? onKeywordDetected;
-
   Future<void> initialize() async {
     bool available = await _speech.initialize(
       onStatus: _onStatus,
@@ -61,8 +59,8 @@ class SpeechToTextService {
         print('--------- _onResult3:' + keyword);
         final message = '$keywordを探します';
         tTSNotifier.speak(message);
-        // このキーワードをモデルの変数に格納
-        onKeywordDetected?.call(keyword);
+        // このキーワードを目標として設定
+        return keyword;
       }
     }
     print('--------- _onResult4:');

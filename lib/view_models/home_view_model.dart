@@ -14,7 +14,7 @@ class HomeViewModel extends BaseViewModel<HomeViewState> {
 
   late TensorFlowService _tensorFlowService;
   String _recognizedText = "";
-  String? get recognizedText => targetKeyword;
+  // String? get recognizedText => targetKeyword;
 
   late SpeechToTextService _speechService;
   late TTSNotifier _ttsNotifier;
@@ -22,12 +22,9 @@ class HomeViewModel extends BaseViewModel<HomeViewState> {
   // コンストラクタ※インスタンス化された時に呼ばれる
   HomeViewModel(BuildContext context, this._tensorFlowService)
       : super(context, HomeViewState(_tensorFlowService.type)) {
+    _speechService = SpeechToTextService(super.targetKeyword);
+    _ttsNotifier = TTSNotifier();
     _initializeSpeech();
-
-    _speechService.onKeywordDetected = (keyword) {
-      targetKeyword = keyword; // BaseViewModelのtargetKeywordにセット
-      notifyListeners(); // UIの更新
-    };
   }
 
   void _initializeSpeech() async {

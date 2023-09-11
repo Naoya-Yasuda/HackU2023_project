@@ -17,9 +17,12 @@ abstract class BaseViewModel<T> with ChangeNotifier {
 
   String get targetKeyword => _targetKeyword;
 
-  set targetKeyword(String value) {
-    _targetKeyword = value;
-    notifyListeners(); // この行は必要に応じて追加してください
+  set targetKeyword(String keyword) {
+    final RegExp pattern = RegExp(r'(.+?)を探して');
+    final Match? match = pattern.firstMatch(keyword);
+    if (match != null && match.groupCount > 0) {
+      _targetKeyword = match.group(1)!;
+    }
   }
 
   T get state => _state;
