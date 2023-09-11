@@ -20,10 +20,10 @@ class HomeViewModel extends BaseViewModel<HomeViewState> {
   late TTSNotifier _ttsNotifier;
 
   HomeViewModel(BuildContext context, this._tensorFlowService)
-      : _speechService = SpeechToTextService(), // ここで初期化
+      : _speechService = SpeechToTextService(),
+        _ttsNotifier = TTSNotifier(),
         super(context, HomeViewState(_tensorFlowService.type)) {
     _initializeSpeech();
-    _ttsNotifier = TTSNotifier();
   }
 
   void _initializeSpeech() async {
