@@ -19,12 +19,11 @@ class HomeViewModel extends BaseViewModel<HomeViewState> {
   late SpeechToTextService _speechService;
   late TTSNotifier _ttsNotifier;
 
-  // コンストラクタ※インスタンス化された時に呼ばれる
   HomeViewModel(BuildContext context, this._tensorFlowService)
-      : super(context, HomeViewState(_tensorFlowService.type)) {
-    _speechService = SpeechToTextService(super.targetKeyword);
-    _ttsNotifier = TTSNotifier();
+      : _speechService = SpeechToTextService(), // ここで初期化
+        super(context, HomeViewState(_tensorFlowService.type)) {
     _initializeSpeech();
+    _ttsNotifier = TTSNotifier();
   }
 
   void _initializeSpeech() async {
@@ -34,7 +33,6 @@ class HomeViewModel extends BaseViewModel<HomeViewState> {
   // New methods for speech recognition
   Future<void> startListening() async {
     print('--------- HomeViewModel.startListening:');
-    _isListening = true;
     await _speechService.startListening();
   }
 

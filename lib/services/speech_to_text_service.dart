@@ -8,7 +8,7 @@ class SpeechToTextService {
   bool _isListening = false;
   String _recognizedText = '';
 
-  SpeechToTextService(String targetKeyword);
+  SpeechToTextService();
   // 消してhomeViewModelで使う予定
   late final TTSNotifier tTSNotifier = TTSNotifier(); // lateを使う
 
@@ -23,7 +23,10 @@ class SpeechToTextService {
   }
 
   Future<void> startListening() async {
+    print('--------- SpeechToTextService.startListening1:');
     if (!_isListening) {
+      print('--------- SpeechToTextService.startListening2:');
+      _isListening = true;
       _speech.listen(onResult: _onResult, localeId: 'ja_JP');
     }
   }
