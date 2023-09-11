@@ -167,10 +167,10 @@ class TensorFlowService {
     if (_previousRecognitions != null &&
         recognitions.toString() == _previousRecognitions.toString()) {
       // 前回の結果と同じ場合、何もしない
-      isLoading = false;
+      duplicateFlag = true;
       return null;
     } else {
-      isLoading = true;
+      duplicateFlag = false;
     }
 
     _previousRecognitions = recognitions; // 結果を更新

@@ -19,7 +19,6 @@ class TTSNotifier {
     if (!isCurrentlySpeaking) {
       isCurrentlySpeaking = true;
       await flutterTts.speak(message);
-      isCurrentlySpeaking = false;
     }
   }
 
@@ -50,14 +49,13 @@ class TTSNotifier {
       }
     }
     print('isCurrentlySpeaking:' + isCurrentlySpeaking.toString());
-    if (!isCurrentlySpeaking) {
+    if (!isCurrentlySpeaking && !isMp3Playing) {
       Vibration.vibrate(duration: duration);
       await audioService.playSound(0);
     }
-    print('isaudio:' + isaudio.toString());
-    if (isaudio) {
-      speak(message);
-      isaudio = false;
+    print('isMp3Playing:' + isMp3Playing.toString());
+    if (!isMp3Playing) {
+      await speak(message);
     }
   }
 }
