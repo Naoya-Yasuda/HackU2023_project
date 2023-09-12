@@ -24,16 +24,22 @@ class SpeechToTextService {
 
   Future<void> startListening() async {
     print('--------- SpeechToTextService.startListening1:');
-    if (!_isListening) {
-      print('--------- SpeechToTextService.startListening2:');
-      _isListening = true;
-      _speech.listen(onResult: _onResult, localeId: 'ja_JP');
+    try {
+      if (!_isListening && _speech.isAvailable) {
+        print('--------- SpeechToTextService.startListening2:');
+        _isListening = true;
+        _speech.listen(onResult: _onResult, localeId: 'ja_JP');
+      }
+    } catch (e) {
+      print('--------- SpeechToTextService.startListening3:' + e.toString());
     }
   }
 
   Future<void> stopListening() async {
+    print('--------- SpeechToTextService.stopListening:');
     if (_isListening) {
       _speech.stop();
+      _isListening = false;
     }
   }
 
