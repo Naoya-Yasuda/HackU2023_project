@@ -46,7 +46,6 @@ class HomeViewModel extends BaseViewModel<HomeViewState> {
     await _speechService.stopListening();
     _recognizedText = _speechService.getRecognizedText()!;
     print('_recognizedText:' + _recognizedText);
-    // TODO: 目標が検知されたら、音声を再生する
     notifyListeners(); // To update the UI if needed
   }
 
