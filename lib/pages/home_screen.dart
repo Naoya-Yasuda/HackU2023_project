@@ -83,7 +83,9 @@ class _HomeScreenState extends BaseStateful<HomeScreen, HomeViewModel>
   }
 
   Future<void> runModel(CameraImage image) async {
+    print('screen runModelOn1:');
     if (mounted) {
+      print('screen runModelOn2:');
       await viewModel.runModel(image);
     }
   }

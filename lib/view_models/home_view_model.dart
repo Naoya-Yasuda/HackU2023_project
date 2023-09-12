@@ -60,8 +60,11 @@ class HomeViewModel extends BaseViewModel<HomeViewState> {
   }
 
   Future<void> runModel(CameraImage cameraImage) async {
+    print('runModel1:');
     if (_isLoadModel && mounted) {
+      print('runModel2:');
       if (!this._isDetecting && mounted) {
+        print('runModel3:');
         this._isDetecting = true;
         int startTime = new DateTime.now().millisecondsSinceEpoch;
         var recognitions =
