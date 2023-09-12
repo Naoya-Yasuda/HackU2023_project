@@ -42,6 +42,7 @@ dependencies:
   vibration: ^1.8.1
   audioplayers: ^0.20.1
   speech_to_text: ^6.3.0
+  permission_handler: ^8.2.2
 
 dev_dependencies:
   flutter_test:
