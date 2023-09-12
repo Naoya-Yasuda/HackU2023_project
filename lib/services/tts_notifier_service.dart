@@ -35,6 +35,7 @@ class TTSNotifier {
     if (objJpLabel == targetKeyword) {
       print('objJpLabel2:$objJpLabel targetKeyword2: $targetKeyword');
       message = "目標に到達しました。$objJpLabelが$directionの方向にあります。";
+      duration = 3000;
     } else {
       print('else onObjectDetected');
       if (objSize.width > 500 && objSize.height > 300) {
