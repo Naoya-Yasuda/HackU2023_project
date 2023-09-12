@@ -74,13 +74,12 @@ class HomeViewModel extends BaseViewModel<HomeViewState> {
         var recognitions =
             await this._tensorFlowService.runModelOnFrame(cameraImage);
         final noticeFunction = this._ttsNotifier.onObjectDetected;
-        print('runModel targetKeyword:' + _targetKeyword!);
-        this._tensorFlowService.checkDetectedObjectSize(
-            recognitions,
-            cameraImage.width,
-            cameraImage.height,
-            noticeFunction,
-            _targetKeyword!);
+        final target = this._speechService.getTarget();
+
+        print('runModel targetKeyword:' + target!);
+
+        this._tensorFlowService.checkDetectedObjectSize(recognitions,
+            cameraImage.width, cameraImage.height, noticeFunction, target);
         int endTime = new DateTime.now().millisecondsSinceEpoch;
         print('Time detection: ${endTime - startTime}');
         if (recognitions != null && mounted) {

@@ -8,8 +8,11 @@ class SpeechToTextService {
 
   bool _isListening = false;
   String _recognizedText = '';
+  String _target = '';
 
-  SpeechToTextService(String targetKeyword);
+  SpeechToTextService(String targetKeyword) {
+    _target = targetKeyword;
+  }
 
   Function(String)? onKeywordDetected;
 
@@ -68,6 +71,10 @@ class SpeechToTextService {
     return _recognizedText;
   }
 
+  String? getTarget() {
+    return _target;
+  }
+
   String? _onResult(SpeechRecognitionResult result) {
     print('--------- _onResult0:');
     _recognizedText = result.recognizedWords;
@@ -90,7 +97,8 @@ class SpeechToTextService {
         final message = '$keywordを探します';
         tTSNotifier.speak(message);
         // このキーワードを目標として設定
-        onKeywordDetected?.call(keyword);
+        // onKeywordDetected?.call(keyword);
+        _target = keyword;
       }
     }
     print('--------- _onResult4:');
