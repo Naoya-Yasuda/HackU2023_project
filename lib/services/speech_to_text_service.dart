@@ -9,11 +9,15 @@ class SpeechToTextService {
   bool _isListening = false;
   String _recognizedText = '';
 
-  SpeechToTextService();
+  SpeechToTextService(String targetKeyword);
+
+  Function(String)? onKeywordDetected;
+
   // 消してhomeViewModelで使う予定
   late final TTSNotifier tTSNotifier = TTSNotifier(); // lateを使う
 
   Future<void> initialize() async {
+    print('initialize');
     bool hasPermission = await _requestMicrophonePermission();
     if (!hasPermission) {
       print("Microphone permission was not granted");
@@ -86,7 +90,7 @@ class SpeechToTextService {
         final message = '$keywordを探します';
         tTSNotifier.speak(message);
         // このキーワードを目標として設定
-        return keyword;
+        onKeywordDetected?.call(keyword);
       }
     }
     print('--------- _onResult4:');
