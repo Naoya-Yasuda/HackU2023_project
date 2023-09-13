@@ -12,7 +12,7 @@ class AudioService {
   Future<void> playSound(num type) async {
     Completer<void> completer = Completer();
     AudioPlayer? audioPlayerInstance;
-
+    print('duplicateFlag' + duplicateFlag.toString());
     if (!duplicateFlag) {
       isMp3Playing = true;
       if (type == 0) {
