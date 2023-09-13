@@ -77,7 +77,7 @@ class HomeViewModel extends BaseViewModel<HomeViewState> {
 
         print('runModel targetKeyword:' + target!);
 
-        var isGoal = this._tensorFlowService.checkDetectedObjectSize(
+        var isGoal = await this._tensorFlowService.checkDetectedObjectSize(
             recognitions,
             cameraImage.width,
             cameraImage.height,

@@ -139,8 +139,12 @@ class TensorFlowService {
     return recognitions;
   }
 
-  bool checkDetectedObjectSize(List<dynamic>? recognitions, int imageWidth,
-      int imageHeight, Function noticeFunction, String targetKeyword) {
+  Future<bool> checkDetectedObjectSize(
+      List<dynamic>? recognitions,
+      int imageWidth,
+      int imageHeight,
+      Function noticeFunction,
+      String targetKeyword) async {
     var isGoal = false;
     for (var obj in recognitions!) {
       var label = obj['detectedClass'];
@@ -162,8 +166,8 @@ class TensorFlowService {
           } else {
             direction = '目の前';
           }
-          var tempGaolFlag =
-              noticeFunction(predefinedObj[label], direction, targetKeyword);
+          var tempGaolFlag = await noticeFunction(
+              predefinedObj[label], direction, targetKeyword);
           if (!isGoal && tempGaolFlag) {
             isGoal = true;
           }
