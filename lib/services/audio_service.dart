@@ -27,7 +27,16 @@ class AudioService {
       completer.complete();
     });
 
-    // この行で、音声の再生が終了するのを待ちます。
-    await completer.future;
+    // タイムアウトを設定します。ここでは10秒後にタイムアウトするようにしています。
+    return completer.future.timeout(
+      Duration(seconds: 5),
+      onTimeout: () {
+        if (!completer.isCompleted) {
+          // タイムアウト時の処理を追加することができます。
+          isMp3Playing = false;
+          throw TimeoutException('Audio playback took too long to complete.');
+        }
+      },
+    );
   }
 }

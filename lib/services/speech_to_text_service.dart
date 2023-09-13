@@ -79,6 +79,7 @@ class SpeechToTextService {
     print('--------- _onResult0:');
     _recognizedText = result.recognizedWords;
     print('--------- _onResult1 _recognizedText:' + _recognizedText!);
+
     final RegExp pattern = RegExp(r'(.+?)を探して');
     final Match? match = pattern.firstMatch(_recognizedText!);
     final supportedKeywords = [
@@ -89,16 +90,18 @@ class SpeechToTextService {
     ];
 
     if (match != null && match.groupCount > 0) {
-      String keyword = match.group(1)!; // 抜き出されたキーワード
-      print('--------- _onResult2:' + keyword);
+      String extractedText = match.group(1)!; // 抜き出されたテキスト
+      print('--------- _onResult2:' + extractedText);
 
-      if (supportedKeywords.contains(keyword)) {
-        print('--------- _onResult3:' + keyword);
-        final message = '$keywordを探します';
-        tTSNotifier.speak(message);
-        // このキーワードを目標として設定
-        // onKeywordDetected?.call(keyword);
-        _target = keyword;
+      // 抜き出されたテキストの中に、supportedKeywordsのキーワードが含まれているか確認
+      for (var keyword in supportedKeywords) {
+        if (extractedText.contains(keyword)) {
+          print('--------- _onResult3:' + keyword);
+          final message = '$keywordを探します';
+          tTSNotifier.speak(message);
+          _target = keyword;
+          break; // キーワードが見つかったのでループを抜ける
+        }
       }
     }
     print('--------- _onResult4:');
