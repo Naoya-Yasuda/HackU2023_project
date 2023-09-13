@@ -139,8 +139,9 @@ class TensorFlowService {
     return recognitions;
   }
 
-  void checkDetectedObjectSize(List<dynamic>? recognitions, int imageWidth,
+  bool checkDetectedObjectSize(List<dynamic>? recognitions, int imageWidth,
       int imageHeight, Function noticeFunction, String targetKeyword) {
+    var isGoal = false;
     for (var obj in recognitions!) {
       var label = obj['detectedClass'];
       if (predefinedObj.containsKey(label)) {
@@ -161,7 +162,11 @@ class TensorFlowService {
           } else {
             direction = '目の前';
           }
-          noticeFunction(predefinedObj[label], direction, targetKeyword);
+          var tempGaolFlag =
+              noticeFunction(predefinedObj[label], direction, targetKeyword);
+          if (!isGoal && tempGaolFlag) {
+            isGoal = true;
+          }
         }
       }
     }
@@ -170,11 +175,11 @@ class TensorFlowService {
         recognitions.toString() == _previousRecognitions.toString()) {
       // 前回の結果と同じ場合、何もしない
       duplicateFlag = true;
-      return null;
     } else {
       duplicateFlag = false;
+      _previousRecognitions = recognitions; // 結果を更新
     }
 
-    _previousRecognitions = recognitions; // 結果を更新
+    return isGoal;
   }
 }

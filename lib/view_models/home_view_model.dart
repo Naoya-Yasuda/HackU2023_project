@@ -77,8 +77,16 @@ class HomeViewModel extends BaseViewModel<HomeViewState> {
 
         print('runModel targetKeyword:' + target!);
 
-        this._tensorFlowService.checkDetectedObjectSize(recognitions,
-            cameraImage.width, cameraImage.height, noticeFunction, target);
+        var isGoal = this._tensorFlowService.checkDetectedObjectSize(
+            recognitions,
+            cameraImage.width,
+            cameraImage.height,
+            noticeFunction,
+            target);
+        // 目標に到達したらtargetKeywordを初期化する
+        if (isGoal) {
+          targetKeyword = "";
+        }
         int endTime = new DateTime.now().millisecondsSinceEpoch;
         print('Time detection: ${endTime - startTime}');
         if (recognitions != null && mounted) {
