@@ -89,7 +89,7 @@ class HomeViewModel extends BaseViewModel<HomeViewState> {
         print('After checkDetectedObjectSize');
         // 目標に到達したらtargetKeywordを初期化する
         if (isGoal) {
-          targetKeyword = "";
+          this._speechService.setTarget('');
         }
         int endTime = new DateTime.now().millisecondsSinceEpoch;
         print('Time detection: ${endTime - startTime}');

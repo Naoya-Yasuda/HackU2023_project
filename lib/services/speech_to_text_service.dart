@@ -76,6 +76,10 @@ class SpeechToTextService {
     return _target;
   }
 
+  void setTarget(String target) {
+    _target = target;
+  }
+
   String? _onResult(SpeechRecognitionResult result) {
     print('--------- _onResult0:');
     _recognizedText = result.recognizedWords;
