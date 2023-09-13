@@ -158,6 +158,7 @@ class SpeechToTextService {
       destination = match2.group(1)!; // 抜き出されたテキスト
       print('道案内のテキスト：$destination');
       await tTSNotifier.speak('$destinationまでの道案内を開始します。');
+      await Future.delayed(Duration(milliseconds: 2000)); // 1.5秒待機
       loadGuide();
     }
     print('--------- _onResult4:');
