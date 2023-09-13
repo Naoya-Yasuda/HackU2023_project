@@ -37,7 +37,8 @@ class SpeechToTextService {
   }
 
   Future<void> startListening() async {
-    print('--------- SpeechToTextService.startListening1:');
+    print('--------- SpeechToTextService.startListening1:' +
+        _isListening.toString());
     try {
       if (!_isListening && _speech.isAvailable) {
         print('--------- SpeechToTextService.startListening2:');

@@ -34,7 +34,8 @@ class AudioService {
         if (!completer.isCompleted) {
           // タイムアウト時の処理を追加することができます。
           isMp3Playing = false;
-          throw TimeoutException('Audio playback took too long to complete.');
+          print('Audio playback took too long to complete.');
+          // throw TimeoutException('Audio playback took too long to complete.');
         }
       },
     );
