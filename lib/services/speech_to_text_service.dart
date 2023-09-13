@@ -268,7 +268,9 @@ class SpeechToTextService {
       'origin': origin,
       'destination': destination,
       'key': apiKey,
-      'language': 'ja'
+      'language': 'ja',
+      'mode': 'walking',
+      'units': 'metric',
     };
 
     final uri =
