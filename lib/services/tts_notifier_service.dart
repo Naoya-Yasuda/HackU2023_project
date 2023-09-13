@@ -16,10 +16,10 @@ class TTSNotifier {
   }
 
   speak(String message) async {
-    if (!isCurrentlySpeaking) {
-      isCurrentlySpeaking = true;
-      await flutterTts.speak(message);
-    }
+    // if (!isCurrentlySpeaking) {
+    isCurrentlySpeaking = true;
+    await flutterTts.speak(message);
+    // }
   }
 
   Future<bool> onObjectDetected(
@@ -60,7 +60,7 @@ class TTSNotifier {
       await audioService.playSound(0);
     }
     print('isMp3Playing:' + isMp3Playing.toString());
-    if (!isMp3Playing || goalFlag) {
+    if ((!isCurrentlySpeaking && !isMp3Playing) || goalFlag) {
       await speak(message);
     }
     return goalFlag;
