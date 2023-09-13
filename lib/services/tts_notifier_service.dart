@@ -5,6 +5,7 @@ import 'audio_service.dart';
 class TTSNotifier {
   final FlutterTts flutterTts = FlutterTts();
   bool isCurrentlySpeaking = false;
+  bool goalFlag = false;
 
   TTSNotifier() {
     flutterTts.setLanguage("ja-JP");
@@ -30,7 +31,6 @@ class TTSNotifier {
     var objSize = object[1];
     String message;
     var duration;
-    var goalFlag = false;
     print('objJpLabel:$objJpLabel targetKeyword: $targetKeyword');
     //目標検知モードかつ検知したオブジェクトが目標の場合
     if (objJpLabel == targetKeyword) {
@@ -63,6 +63,10 @@ class TTSNotifier {
     if ((!isCurrentlySpeaking && !isMp3Playing) || goalFlag) {
       await speak(message);
     }
-    return goalFlag;
+    if (goalFlag) {
+      goalFlag = false;
+      return true;
+    }
+    return false;
   }
 }
