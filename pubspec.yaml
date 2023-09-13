@@ -43,6 +43,8 @@ dependencies:
   audioplayers: ^0.20.1
   speech_to_text: ^6.3.0
   permission_handler: ^8.2.2
+  location: ^5.0.3
+  html: ^0.15.4
 
 dev_dependencies:
   flutter_test:

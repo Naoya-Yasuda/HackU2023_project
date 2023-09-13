@@ -1,7 +1,13 @@
+import 'package:flutter/widgets.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'tts_notifier_service.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:http/http.dart' as http;
+import 'package:location/location.dart' as loc;
+import 'package:html/parser.dart';
+import 'dart:convert';
+import 'dart:async';
 
 class SpeechToTextService {
   final stt.SpeechToText _speech = stt.SpeechToText();
@@ -19,6 +25,15 @@ class SpeechToTextService {
   // 消してhomeViewModelで使う予定
   late final TTSNotifier tTSNotifier = TTSNotifier(); // lateを使う
 
+  Timer? _timer;
+
+  String? _directions;
+
+  //final _destinationController = TextEditingController();
+  String destination = '';
+
+  bool guideFrag = false;
+
   Future<void> initialize() async {
     print('initialize');
     bool hasPermission = await _requestMicrophonePermission();
@@ -34,6 +49,33 @@ class SpeechToTextService {
     if (!available) {
       // Handle the error appropriately
     }
+    _timer = Timer.periodic(Duration(seconds: 3), (timer) {
+      loadGuide();
+    });
+  }
+
+  Future<void> fetchAndSetDirections() async {
+    final apiKey = 'AIzaSyA-3ZfIrqxoICutfetO0GujoL5_Q0mW5OI';
+    String currentLocation = await getCurrentLocation();
+    final result = await fetchDirections(apiKey, currentLocation, destination);
+    if (result != null &&
+        result['routes'] != null &&
+        result['routes'].isNotEmpty) {
+      String htmlDirections =
+          result['routes'][0]['legs'][0]['steps'][0]['html_instructions'];
+      _directions = convertHtmlToPlainText(htmlDirections);
+      if (result['routes'][0]['legs'][0]['end_address'] != null) {
+        //goalFlag = true;
+        //print('Destination reached!');
+      }
+    }
+  }
+
+  String convertHtmlToPlainText(String htmlString) {
+    final document = parse(htmlString);
+    final String parsedString =
+        parse(document.body!.text).documentElement!.text;
+    return parsedString;
   }
 
   Future<void> startListening() async {
@@ -80,13 +122,15 @@ class SpeechToTextService {
     _target = target;
   }
 
-  String? _onResult(SpeechRecognitionResult result) {
+  Future<String?> _onResult(SpeechRecognitionResult result) async {
     print('--------- _onResult0:');
     _recognizedText = result.recognizedWords;
     print('--------- _onResult1 _recognizedText:' + _recognizedText!);
 
     final RegExp pattern = RegExp(r'(.+?)を探して');
     final Match? match = pattern.firstMatch(_recognizedText!);
+    final RegExp pattern2 = RegExp(r'(.+?)まで案内して');
+    final Match? match2 = pattern2.firstMatch(_recognizedText!);
     final supportedKeywords = [
       '椅子',
       '人間',
@@ -108,6 +152,13 @@ class SpeechToTextService {
           break; // キーワードが見つかったのでループを抜ける
         }
       }
+    } else if (match2 != null) {
+      //道案内の場合
+      guideFrag = true;
+      destination = match2.group(1)!; // 抜き出されたテキスト
+      print('道案内のテキスト：$destination');
+      await tTSNotifier.speak('$destinationまでの道案内を開始します。');
+      loadGuide();
     }
     print('--------- _onResult4:');
     return null;
@@ -120,5 +171,108 @@ class SpeechToTextService {
 
   void _onError(dynamic error) {
     print("Error in speech recognition: $error");
+  }
+
+  Future<void> loadGuide() async {
+    if (!guideFrag) {
+      return;
+    }
+    final apiKey = 'AIzaSyA-3ZfIrqxoICutfetO0GujoL5_Q0mW5OI';
+    String currentLocation = await getCurrentLocation();
+    var goalFlag = false;
+    String _directions = '';
+    while (!goalFlag) {
+      final result =
+          await fetchDirections(apiKey, currentLocation, destination);
+
+      if (result != null &&
+          result['routes'] != null &&
+          result['routes'].isNotEmpty &&
+          result['routes'][0]['legs'] != null &&
+          result['routes'][0]['legs'].isNotEmpty &&
+          result['routes'][0]['legs'][0]['steps'] != null &&
+          result['routes'][0]['legs'][0]['steps'].isNotEmpty) {
+        String htmlDirections =
+            result['routes'][0]['legs'][0]['steps'][0]['html_instructions'];
+        _directions = convertHtmlToPlainText(htmlDirections);
+        // ルート情報を取得します
+        List<dynamic> routes = result['routes'];
+        if (routes != null && routes.isNotEmpty) {
+          // 最初のルートを取得します
+          Map<String, dynamic> route = routes[0];
+
+          // ルートのレッグ情報を取得します
+          List<dynamic> legs = route['legs'];
+
+          if (legs != null && legs.isNotEmpty) {
+            // 最後のレッグを取得します
+            Map<String, dynamic> lastLeg = legs.last;
+
+            // レッグのステップ情報を取得します
+            List<dynamic> steps = lastLeg['steps'];
+
+            if (steps != null && steps.isNotEmpty) {
+              // 最後のステップを取得します
+              Map<String, dynamic> lastStep = steps.last;
+
+              // 最後のステップの終了地点情報を取得します
+              Map<String, dynamic> endLocation = lastStep['end_location'];
+
+              if (endLocation != null) {
+                print("目的地に到着しました！$endLocation");
+                goalFlag = true;
+                guideFrag = false;
+                _timer?.cancel();
+              } else {
+                print("まだ目的地に到着していません。");
+              }
+            } else {
+              print("ステップ情報が見つかりませんでした。");
+            }
+          } else {
+            print("レッグ情報が見つかりませんでした。");
+          }
+        } else {
+          print("ルート情報が見つかりませんでした。");
+          _directions = "経路が見つかりませんでした";
+        }
+
+        tTSNotifier.speak(_directions);
+
+        //await Future.delayed(Duration(seconds: 10));
+        print('directions:$_directions');
+      }
+    }
+  }
+
+  Future<String> getCurrentLocation() async {
+    final location = loc.Location();
+    final hasPermission = await location.hasPermission();
+    if (hasPermission == PermissionStatus.denied) {
+      await location.requestPermission();
+    }
+    final currentLocation = await location.getLocation();
+    return '${currentLocation.latitude},${currentLocation.longitude}';
+  }
+
+  Future<Map<String, dynamic>> fetchDirections(
+      String apiKey, String origin, String destination) async {
+    const endpointUrl = 'https://maps.googleapis.com/maps/api/directions/json';
+    final queryParameters = {
+      'origin': origin,
+      'destination': destination,
+      'key': apiKey,
+      'language': 'ja'
+    };
+
+    final uri =
+        Uri.parse(endpointUrl).replace(queryParameters: queryParameters);
+    final response = await http.get(uri);
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Failed to fetch directions');
+    }
   }
 }
