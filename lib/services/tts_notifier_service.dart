@@ -54,8 +54,8 @@ class TTSNotifier {
       }
     }
     print('isCurrentlySpeaking:' + isCurrentlySpeaking.toString());
-    goalFlag = true;
     if ((!isCurrentlySpeaking && !isMp3Playing) || goalFlag) {
+      print('goalFlag:' + goalFlag.toString());
       Vibration.vibrate(duration: duration);
       await audioService.playSound(0);
     }
