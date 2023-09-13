@@ -70,12 +70,15 @@ class HomeViewModel extends BaseViewModel<HomeViewState> {
         print('runModel3:');
         this._isDetecting = true;
         int startTime = new DateTime.now().millisecondsSinceEpoch;
+        print('Before runModelOnFrame');
         var recognitions =
             await this._tensorFlowService.runModelOnFrame(cameraImage);
+        print('After runModelOnFrame');
         final noticeFunction = this._ttsNotifier.onObjectDetected;
         final target = this._speechService.getTarget();
 
         print('runModel targetKeyword:' + target!);
+        print('Before checkDetectedObjectSize');
 
         var isGoal = await this._tensorFlowService.checkDetectedObjectSize(
             recognitions,
@@ -83,6 +86,7 @@ class HomeViewModel extends BaseViewModel<HomeViewState> {
             cameraImage.height,
             noticeFunction,
             target);
+        print('After checkDetectedObjectSize');
         // 目標に到達したらtargetKeywordを初期化する
         if (isGoal) {
           targetKeyword = "";
