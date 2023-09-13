@@ -8,6 +8,7 @@ import 'package:location/location.dart' as loc;
 import 'package:html/parser.dart';
 import 'dart:convert';
 import 'dart:async';
+import 'dart:math' as math;
 
 class SpeechToTextService {
   final stt.SpeechToText _speech = stt.SpeechToText();
@@ -52,23 +53,6 @@ class SpeechToTextService {
     _timer = Timer.periodic(Duration(seconds: 3), (timer) {
       loadGuide();
     });
-  }
-
-  Future<void> fetchAndSetDirections() async {
-    final apiKey = 'AIzaSyA-3ZfIrqxoICutfetO0GujoL5_Q0mW5OI';
-    String currentLocation = await getCurrentLocation();
-    final result = await fetchDirections(apiKey, currentLocation, destination);
-    if (result != null &&
-        result['routes'] != null &&
-        result['routes'].isNotEmpty) {
-      String htmlDirections =
-          result['routes'][0]['legs'][0]['steps'][0]['html_instructions'];
-      _directions = convertHtmlToPlainText(htmlDirections);
-      if (result['routes'][0]['legs'][0]['end_address'] != null) {
-        //goalFlag = true;
-        //print('Destination reached!');
-      }
-    }
   }
 
   String convertHtmlToPlainText(String htmlString) {
@@ -179,47 +163,67 @@ class SpeechToTextService {
       return;
     }
     final apiKey = 'AIzaSyA-3ZfIrqxoICutfetO0GujoL5_Q0mW5OI';
-    String currentLocation = await getCurrentLocation();
+    var currentLocation = await getCurrentLocation();
+    print('currentLocation:${currentLocation.toString()}');
+    var userLocationParam = '${currentLocation[0]},${currentLocation[1]}';
     var goalFlag = false;
     String _directions = '';
     while (!goalFlag) {
       final result =
-          await fetchDirections(apiKey, currentLocation, destination);
+          await fetchDirections(apiKey, userLocationParam, destination);
 
-      if (result != null &&
-          result['routes'] != null &&
-          result['routes'].isNotEmpty &&
-          result['routes'][0]['legs'] != null &&
-          result['routes'][0]['legs'].isNotEmpty &&
-          result['routes'][0]['legs'][0]['steps'] != null &&
-          result['routes'][0]['legs'][0]['steps'].isNotEmpty) {
-        String htmlDirections =
-            result['routes'][0]['legs'][0]['steps'][0]['html_instructions'];
-        _directions = convertHtmlToPlainText(htmlDirections);
-        // ルート情報を取得します
-        List<dynamic> routes = result['routes'];
-        if (routes != null && routes.isNotEmpty) {
-          // 最初のルートを取得します
-          Map<String, dynamic> route = routes[0];
+      String htmlDirections =
+          result['routes'][0]['legs'][0]['steps'][0]['html_instructions'];
+      _directions = convertHtmlToPlainText(htmlDirections);
+      // ルート情報を取得します
+      List<dynamic> routes = result['routes'];
+      if (routes != null && routes.isNotEmpty) {
+        // 最初のルートを取得します
+        Map<String, dynamic> route = routes[0];
 
-          // ルートのレッグ情報を取得します
-          List<dynamic> legs = route['legs'];
+        // ルートのレッグ情報を取得します
+        List<dynamic> legs = route['legs'];
 
-          if (legs != null && legs.isNotEmpty) {
-            // 最後のレッグを取得します
-            Map<String, dynamic> lastLeg = legs.last;
+        if (legs != null && legs.isNotEmpty) {
+          // 最後のレッグを取得します
+          Map<String, dynamic> lastLeg = legs.last;
 
-            // レッグのステップ情報を取得します
-            List<dynamic> steps = lastLeg['steps'];
+          // レッグのステップ情報を取得します
+          List<dynamic> steps = lastLeg['steps'];
 
-            if (steps != null && steps.isNotEmpty) {
-              // 最後のステップを取得します
-              Map<String, dynamic> lastStep = steps.last;
+          if (steps != null && steps.isNotEmpty) {
+            // 最後のステップを取得します
+            Map<String, dynamic> lastStep = steps.last;
 
-              // 最後のステップの終了地点情報を取得します
-              Map<String, dynamic> endLocation = lastStep['end_location'];
+            // 最後のステップの終了地点情報を取得します
+            Map<String, dynamic> endLocation = lastStep['end_location'];
 
-              if (endLocation != null) {
+            if (endLocation != null) {
+              // 終了地点とユーザーの現在地が一致しているか確認します
+              double lat1 = endLocation['lat'];
+              double lng1 = endLocation['lng'];
+              double lat2 = currentLocation[0];
+              double lng2 = currentLocation[1];
+
+              // 緯度経度をラジアンに変換します
+              double dLat = _degreesToRadians(lat2 - lat1);
+              double dLng = _degreesToRadians(lng2 - lng1);
+
+              // ハバーサイン公式を使用して2点間の距離を計算します
+              double a = math.sin(dLat / 2) * math.sin(dLat / 2) +
+                  math.cos(_degreesToRadians(lat1)) *
+                      math.cos(_degreesToRadians(lat2)) *
+                      math.sin(dLng / 2) *
+                      math.sin(dLng / 2);
+              double c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
+              // 地球の半径（メートル）
+              const double earthRadius = 6371000;
+
+              // 誤差許容範囲（メートル）
+              const double tolerance = 10;
+              double distance = earthRadius * c;
+
+              if (distance <= tolerance) {
                 print("目的地に到着しました！$endLocation");
                 goalFlag = true;
                 guideFrag = false;
@@ -227,33 +231,34 @@ class SpeechToTextService {
               } else {
                 print("まだ目的地に到着していません。");
               }
-            } else {
-              print("ステップ情報が見つかりませんでした。");
             }
           } else {
-            print("レッグ情報が見つかりませんでした。");
+            print("ステップ情報が見つかりませんでした。");
           }
         } else {
-          print("ルート情報が見つかりませんでした。");
-          _directions = "経路が見つかりませんでした";
+          print("レッグ情報が見つかりませんでした。");
         }
-
-        tTSNotifier.speak(_directions);
-
-        //await Future.delayed(Duration(seconds: 10));
-        print('directions:$_directions');
+      } else {
+        print("ルート情報が見つかりませんでした。");
+        _directions = "経路が見つかりませんでした";
       }
+
+      tTSNotifier.speak(_directions);
+
+      //await Future.delayed(Duration(seconds: 10));
+      print('directions:$_directions');
     }
   }
 
-  Future<String> getCurrentLocation() async {
+  Future<List<dynamic>> getCurrentLocation() async {
     final location = loc.Location();
     final hasPermission = await location.hasPermission();
     if (hasPermission == PermissionStatus.denied) {
       await location.requestPermission();
     }
     final currentLocation = await location.getLocation();
-    return '${currentLocation.latitude},${currentLocation.longitude}';
+    return [currentLocation.latitude, currentLocation.longitude];
+    // return '${currentLocation.latitude},${currentLocation.longitude}';
   }
 
   Future<Map<String, dynamic>> fetchDirections(
@@ -275,5 +280,10 @@ class SpeechToTextService {
     } else {
       throw Exception('Failed to fetch directions');
     }
+  }
+
+  // 度数法からラジアンへの変換関数
+  double _degreesToRadians(double degrees) {
+    return degrees * math.pi / 180;
   }
 }
