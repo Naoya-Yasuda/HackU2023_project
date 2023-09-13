@@ -50,9 +50,6 @@ class SpeechToTextService {
     if (!available) {
       // Handle the error appropriately
     }
-    _timer = Timer.periodic(Duration(seconds: 3), (timer) {
-      loadGuide();
-    });
   }
 
   String convertHtmlToPlainText(String htmlString) {
@@ -224,6 +221,7 @@ class SpeechToTextService {
               double distance = earthRadius * c;
 
               if (distance <= tolerance) {
+                //TODO:犬の鳴き声2回 バイブレーション
                 print("目的地に到着しました！$endLocation");
                 goalFlag = true;
                 guideFrag = false;
@@ -245,7 +243,7 @@ class SpeechToTextService {
 
       tTSNotifier.speak(_directions);
 
-      //await Future.delayed(Duration(seconds: 10));
+      await Future.delayed(Duration(seconds: 3));
       print('directions:$_directions');
     }
   }
