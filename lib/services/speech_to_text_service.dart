@@ -353,32 +353,48 @@ class SpeechToTextService {
       heading = 360 + heading;
     }
 
-    // 方角にマッピング
-    if (heading >= 337.5 || heading < 22.5) {
+    // 16方位にマッピング
+    if (heading >= 348.75 || heading < 11.25) {
       return "北";
-    } else if (heading >= 22.5 && heading < 67.5) {
+    } else if (heading >= 11.25 && heading < 33.75) {
+      return "北北東";
+    } else if (heading >= 33.75 && heading < 56.25) {
       return "北東";
-    } else if (heading >= 67.5 && heading < 112.5) {
+    } else if (heading >= 56.25 && heading < 78.75) {
+      return "東北東";
+    } else if (heading >= 78.75 && heading < 101.25) {
       return "東";
-    } else if (heading >= 112.5 && heading < 146.25) {
+    } else if (heading >= 101.25 && heading < 123.75) {
+      return "東南東";
+    } else if (heading >= 123.75 && heading < 146.25) {
+      return "南東";
+    } else if (heading >= 146.25 && heading < 168.75) {
       return "南南東";
-    } else if (heading >= 146.25 && heading < 202.5) {
+    } else if (heading >= 168.75 && heading < 191.25) {
       return "南";
-    } else if (heading >= 202.5 && heading < 247.5) {
+    } else if (heading >= 191.25 && heading < 213.75) {
+      return "南南西";
+    } else if (heading >= 213.75 && heading < 236.25) {
       return "南西";
-    } else if (heading >= 247.5 && heading < 292.5) {
+    } else if (heading >= 236.25 && heading < 258.75) {
+      return "西南西";
+    } else if (heading >= 258.75 && heading < 281.25) {
       return "西";
-    } else {
+    } else if (heading >= 281.25 && heading < 303.75) {
+      return "西北西";
+    } else if (heading >= 303.75 && heading < 326.25) {
       return "北西";
+    } else {
+      return "北北西";
     }
   }
 
-  Future<String> loadAsset() async {
+  Future<String> loadConfig() async {
     return await rootBundle.loadString('assets/conf.json');
   }
 
   Future<String> getAPIKey() async {
-    String jsonString = await loadAsset();
+    String jsonString = await loadConfig();
     final jsonResponse = json.decode(jsonString);
     return jsonResponse['API_KEY'];
   }
