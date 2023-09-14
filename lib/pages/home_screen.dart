@@ -5,7 +5,6 @@ import 'dart:ui' as UI;
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_realtime_object_detection/app/app_resources.dart';
 import 'package:flutter_realtime_object_detection/app/app_router.dart';
 import 'package:flutter_realtime_object_detection/app/base/base_stateful.dart';
@@ -15,7 +14,6 @@ import 'package:flutter_realtime_object_detection/services/tensorflow_service.da
 import 'package:flutter_realtime_object_detection/view_models/home_view_model.dart';
 import 'package:flutter_realtime_object_detection/widgets/aperture/aperture_widget.dart';
 import 'package:flutter_realtime_object_detection/widgets/confidence_widget.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:provider/provider.dart';
 import 'package:screenshot/screenshot.dart';
@@ -36,10 +34,6 @@ class _HomeScreenState extends BaseStateful<HomeScreen, HomeViewModel>
   late StreamController<Map> apertureController;
 
   late ScreenshotController screenshotController;
-
-  late Uint8List _imageFile;
-  // 誤検知対策で使用するフレーム数
-  num frameCount = 0;
 
   @override
   bool get wantKeepAlive => true;
@@ -75,8 +69,7 @@ class _HomeScreenState extends BaseStateful<HomeScreen, HomeViewModel>
         if (!mounted) {
           return;
         }
-        await viewModel.runModel(image, frameCount);
-        frameCount++;
+        await viewModel.runModel(image);
       });
     });
   }
@@ -89,8 +82,7 @@ class _HomeScreenState extends BaseStateful<HomeScreen, HomeViewModel>
     print('screen runModelOn1:');
     if (mounted) {
       print('screen runModelOn2:');
-      await viewModel.runModel(image, frameCount);
-      frameCount++;
+      await viewModel.runModel(image);
     }
   }
 

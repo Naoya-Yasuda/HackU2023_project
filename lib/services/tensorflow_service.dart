@@ -3,8 +3,6 @@ import 'package:camera/camera.dart';
 import 'package:flutter/services.dart';
 import 'package:tflite/tflite.dart';
 import 'package:image/image.dart' as img;
-// import 'tts_notifier_service.dart';
-import 'audio_service.dart';
 
 enum ModelType { YOLO, SSDMobileNet, MobileNet, PoseNet }
 
@@ -12,12 +10,8 @@ class TensorFlowService {
   ModelType _type = ModelType.YOLO;
   List<dynamic>? _previousRecognitions; //テスト
   ModelType get type => _type;
-  // String _targetKeyword = '';
-  // TensorFlowService(String targetKeyword) {
-  //   this._targetKeyword = targetKeyword;
-  // }
-
-  // late final TTSNotifier ttsNotifier = TTSNotifier(_targetKeyword); // lateを使う
+  Map<String, List<dynamic>> recognitions10times = {};
+  num frameCount = 0;
 
   set type(type) {
     _type = type;
@@ -76,7 +70,6 @@ class TensorFlowService {
   Future<List<dynamic>?> runModelOnFrame(CameraImage image) async {
     List<dynamic>? recognitions = <dynamic>[];
     print('runModelOnFrame1:');
-    // TODO: ご検知対策
     recognitions = await Tflite.detectObjectOnFrame(
       bytesList: image.planes.map((plane) {
         return plane.bytes;
@@ -89,12 +82,21 @@ class TensorFlowService {
       threshold: 0.2,
       numResultsPerClass: 1,
     );
-    // checkDetectedObjectSize(recognitions, image.width, image.height);
-    print('runModelOnFrame2:' + recognitions.toString());
     for (var obj in recognitions!) {
       var label = obj['detectedClass'];
       var confidence = obj['confidenceInClass'];
+
+      if (confidence >= 0.27) {
+        if (recognitions10times.containsKey(label)) {
+          recognitions10times[label]!.add(obj);
+        } else {
+          recognitions10times[label] = [obj];
+        }
+      }
     }
+    print('runModelOnFrame2 recognitions10times:' +
+        recognitions10times.toString());
+    frameCount++;
     return recognitions;
   }
 
@@ -144,61 +146,70 @@ class TensorFlowService {
     return recognitions;
   }
 
-  Future<bool> checkDetectedObjectSize(
-      List<dynamic>? recognitions,
-      int imageWidth,
-      int imageHeight,
-      Function noticeFunction,
-      String targetKeyword,
-      CameraImage image,
-      num frameCount) async {
+  Future<bool> checkDetectedObjectSize(int imageWidth, int imageHeight,
+      Function noticeFunction, String targetKeyword, CameraImage image) async {
     var isGoal = false;
-    for (var obj in recognitions!) {
-      var label = obj['detectedClass'];
-      var trafficLightColor = '';
+    if (frameCount > 8) {
+      for (var item in recognitions10times.entries) {
+        var label = item.key;
+        var list = recognitions10times[label];
+        var length = list?.length;
+        // 信頼度が規定以上の物体を8フレーム中3回以上検知した場合は検知成功とする
+        if (length! >= 3) {
+          print('length! :' + length.toString());
 
-      if (predefinedObj.containsKey(label)) {
-        if (label == 'traffic light') {
-          print('label == traffic light');
-          trafficLightColor = detectTrafficLightColor(image);
-        }
-        print(
-            '---------------checkDetectedObjectSize recognition: $obj.toString()');
-        var predefinedSize = predefinedObj[label]?[1];
-        var width = obj['rect']['w'] * imageWidth;
-        var height = obj['rect']['h'] * imageHeight;
+          // 一番大きい物体を取得
+          var obj = list?.reduce((curr, next) {
+            var currArea = curr['rect']['w'] * curr['rect']['h'];
+            var nextArea = next['rect']['w'] * next['rect']['h'];
+            return currArea >= nextArea ? curr : next;
+          });
 
-        if (width > predefinedSize?.width ||
-            height > predefinedSize?.height ||
-            label == 'traffic light') {
-          // 検知物体の方向を判定する
-          double objectCenterX = obj['rect']['x'] + obj['rect']['w'] / 2;
-          String direction;
-          if (objectCenterX < 0.25) {
-            direction = '左前';
-          } else if (objectCenterX > 0.75) {
-            direction = '右前';
-          } else {
-            direction = '目の前';
-          }
-          var tempGaolFlag = await noticeFunction(predefinedObj[label],
-              direction, targetKeyword, trafficLightColor);
-          if (!isGoal && tempGaolFlag) {
-            isGoal = true;
+          var trafficLightColor = '';
+          if (predefinedObj.containsKey(label)) {
+            if (label == 'traffic light') {
+              print('label == traffic light');
+              trafficLightColor = detectTrafficLightColor(image);
+            }
+            print(
+                '---------------checkDetectedObjectSize recognition: $obj.toString()');
+            var predefinedSize = predefinedObj[label]?[1];
+            var width = obj['rect']['w'] * imageWidth;
+            var height = obj['rect']['h'] * imageHeight;
+
+            if (width > predefinedSize?.width ||
+                height > predefinedSize?.height ||
+                label == 'traffic light') {
+              // 検知物体の方向を判定する
+              double objectCenterX = obj['rect']['x'] + obj['rect']['w'] / 2;
+              String direction;
+              if (objectCenterX < 0.25) {
+                direction = '左前';
+              } else if (objectCenterX > 0.75) {
+                direction = '右前';
+              } else {
+                direction = '目の前';
+              }
+              // 目標到達の場合はフラグを立てる
+              isGoal = !await noticeFunction(predefinedObj[label], direction,
+                  targetKeyword, trafficLightColor);
+            }
           }
         }
-        // }
       }
+      // リセット
+      frameCount = 0;
+      recognitions10times = {};
     }
-    // 前回の結果と新しい結果を比較
-    if (_previousRecognitions != null &&
-        recognitions.toString() == _previousRecognitions.toString()) {
-      // 前回の結果と同じ場合、何もしない
-      duplicateFlag = true;
-    } else {
-      duplicateFlag = false;
-      _previousRecognitions = recognitions; // 結果を更新
-    }
+    // // 前回の結果と新しい結果を比較
+    // if (_previousRecognitions != null &&
+    //     recognitions.toString() == _previousRecognitions.toString()) {
+    //   // 前回の結果と同じ場合、何もしない
+    //   duplicateFlag = true;
+    // } else {
+    //   duplicateFlag = false;
+    //   _previousRecognitions = recognitions; // 結果を更新
+    // }
 
     return isGoal;
   }

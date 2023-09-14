@@ -56,7 +56,7 @@ class HomeViewModel extends BaseViewModel<HomeViewState> {
     this._isLoadModel = true;
   }
 
-  Future<void> runModel(CameraImage cameraImage, num frameCount) async {
+  Future<void> runModel(CameraImage cameraImage) async {
     if (_isLoadModel && mounted) {
       if (!this._isDetecting && mounted) {
         this._isDetecting = true;
@@ -75,13 +75,11 @@ class HomeViewModel extends BaseViewModel<HomeViewState> {
 
         // 検知したオブジェクトのサイズをチェックし通知・警告する
         var isGoal = await this._tensorFlowService.checkDetectedObjectSize(
-            recognitions,
             cameraImage.width,
             cameraImage.height,
             noticeFunction,
             target,
-            cameraImage,
-            frameCount);
+            cameraImage);
 
         // 目標に到達したらtargetKeywordを初期化する
         if (isGoal) {
