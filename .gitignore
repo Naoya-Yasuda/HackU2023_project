@@ -8,7 +8,7 @@
 .buildlog/
 .history
 .svn/
-*log.txt
+*log*.txt
 pubspec.lock
 *.zip
 assets/conf.json

@@ -153,18 +153,20 @@ class TensorFlowService {
       for (var item in recognitions10times.entries) {
         var label = item.key;
         var list = recognitions10times[label];
-        var length = list?.length;
-        // 信頼度が規定以上の物体を8フレーム中3回以上検知した場合は検知成功とする
-        if (length! >= 3) {
-          print('length! :' + length.toString());
 
-          // 一番大きい物体を取得
-          var obj = list?.reduce((curr, next) {
-            var currArea = curr['rect']['w'] * curr['rect']['h'];
-            var nextArea = next['rect']['w'] * next['rect']['h'];
-            return currArea >= nextArea ? curr : next;
-          });
+        // 各信頼度を10倍したものを足し、都度乗算したものをスコアとする
+        var score = 0.0;
+        for (var obj in list!) {
+          print('obj in list :' + obj.toString());
+          score += obj['confidenceInClass'] * 10;
+          score *= score;
+        }
+        print('score :' + score.toString());
 
+        // スコアから成功判定
+        if (score >= 14.0) {
+          // 一番新しい物体情報を取得
+          var lastObj = list.last;
           var trafficLightColor = '';
           if (predefinedObj.containsKey(label)) {
             if (label == 'traffic light') {
@@ -172,16 +174,17 @@ class TensorFlowService {
               trafficLightColor = detectTrafficLightColor(image);
             }
             print(
-                '---------------checkDetectedObjectSize recognition: $obj.toString()');
+                '---------------checkDetectedObjectSize recognition: $lastObj.toString()');
             var predefinedSize = predefinedObj[label]?[1];
-            var width = obj['rect']['w'] * imageWidth;
-            var height = obj['rect']['h'] * imageHeight;
+            var width = lastObj['rect']['w'] * imageWidth;
+            var height = lastObj['rect']['h'] * imageHeight;
 
             if (width > predefinedSize?.width ||
                 height > predefinedSize?.height ||
                 label == 'traffic light') {
               // 検知物体の方向を判定する
-              double objectCenterX = obj['rect']['x'] + obj['rect']['w'] / 2;
+              double objectCenterX =
+                  lastObj['rect']['x'] + lastObj['rect']['w'] / 2;
               String direction;
               if (objectCenterX < 0.35) {
                 direction = '左前';
