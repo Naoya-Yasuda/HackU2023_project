@@ -36,8 +36,6 @@ class TTSNotifier {
     print('objJpLabel:$objJpLabel targetKeyword: $targetKeyword');
     //目標検知モードかつ検知したオブジェクトが目標の場合
     if (objJpLabel == targetKeyword) {
-      // TODO: 目標が通知された時にtargetを初期化する
-      // TODO: 目標到達の通知はスキップされないようにする
       print('objJpLabel2:$objJpLabel targetKeyword2: $targetKeyword');
       message = "目標に到達しました。$objJpLabelが$directionの方向にあります。";
       duration = 3000;

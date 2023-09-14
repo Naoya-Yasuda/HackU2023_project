@@ -183,9 +183,9 @@ class TensorFlowService {
               // 検知物体の方向を判定する
               double objectCenterX = obj['rect']['x'] + obj['rect']['w'] / 2;
               String direction;
-              if (objectCenterX < 0.25) {
+              if (objectCenterX < 0.35) {
                 direction = '左前';
-              } else if (objectCenterX > 0.75) {
+              } else if (objectCenterX > 0.65) {
                 direction = '右前';
               } else {
                 direction = '目の前';
