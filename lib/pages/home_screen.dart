@@ -38,6 +38,8 @@ class _HomeScreenState extends BaseStateful<HomeScreen, HomeViewModel>
   late ScreenshotController screenshotController;
 
   late Uint8List _imageFile;
+  // 誤検知対策で使用するフレーム数
+  num frameCount = 0;
 
   @override
   bool get wantKeepAlive => true;
@@ -73,7 +75,8 @@ class _HomeScreenState extends BaseStateful<HomeScreen, HomeViewModel>
         if (!mounted) {
           return;
         }
-        await viewModel.runModel(image);
+        await viewModel.runModel(image, frameCount);
+        frameCount++;
       });
     });
   }
@@ -86,7 +89,8 @@ class _HomeScreenState extends BaseStateful<HomeScreen, HomeViewModel>
     print('screen runModelOn1:');
     if (mounted) {
       print('screen runModelOn2:');
-      await viewModel.runModel(image);
+      await viewModel.runModel(image, frameCount);
+      frameCount++;
     }
   }
 

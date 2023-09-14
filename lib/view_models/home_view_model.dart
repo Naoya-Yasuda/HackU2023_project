@@ -10,7 +10,6 @@ import 'package:flutter_realtime_object_detection/services/speech_to_text_servic
 class HomeViewModel extends BaseViewModel<HomeViewState> {
   bool _isDetecting = false;
   bool _isLoadModel = false;
-  bool _isListening = false;
 
   late TensorFlowService _tensorFlowService;
   String _recognizedText = "";
@@ -36,16 +35,13 @@ class HomeViewModel extends BaseViewModel<HomeViewState> {
 
   // New methods for speech recognition
   Future<void> startListening() async {
-    print('--------- HomeViewModel.startListening:');
     await _speechService.startListening();
   }
 
   Future<void> stopListening() async {
-    print('--------- HomeViewModel.stopListening:');
-    _isListening = false;
     await _speechService.stopListening();
     _recognizedText = _speechService.getRecognizedText()!;
-    print('_recognizedText:' + _recognizedText);
+    print('stopListening _recognizedText:' + _recognizedText);
     notifyListeners(); // To update the UI if needed
   }
 
@@ -56,50 +52,51 @@ class HomeViewModel extends BaseViewModel<HomeViewState> {
 
   Future<void> loadModel(ModelType type) async {
     state.type = type;
-    //if (type != this._tensorFlowService.type) {
     await this._tensorFlowService.loadModel(type);
-    //}
     this._isLoadModel = true;
   }
 
-  Future<void> runModel(CameraImage cameraImage) async {
-    print('runModel1:');
+  Future<void> runModel(CameraImage cameraImage, num frameCount) async {
     if (_isLoadModel && mounted) {
-      print('runModel2:');
       if (!this._isDetecting && mounted) {
-        print('runModel3:');
         this._isDetecting = true;
         int startTime = new DateTime.now().millisecondsSinceEpoch;
-        print('Before runModelOnFrame');
+
+        // 物体検知の実行
         var recognitions =
             await this._tensorFlowService.runModelOnFrame(cameraImage);
-        print('After runModelOnFrame');
+
+        // 関数に渡す用の通知用関数
         final noticeFunction = this._ttsNotifier.onObjectDetected;
+        // 目標キーワードを取得
         final target = this._speechService.getTarget();
 
         print('runModel targetKeyword:' + target!);
-        print('Before checkDetectedObjectSize');
 
+        // 検知したオブジェクトのサイズをチェックし通知・警告する
         var isGoal = await this._tensorFlowService.checkDetectedObjectSize(
             recognitions,
             cameraImage.width,
             cameraImage.height,
             noticeFunction,
             target,
-            cameraImage);
-        print('After checkDetectedObjectSize');
+            cameraImage,
+            frameCount);
+
         // 目標に到達したらtargetKeywordを初期化する
         if (isGoal) {
           this._speechService.setTarget('');
         }
+        // 計測終了しログ出力
         int endTime = new DateTime.now().millisecondsSinceEpoch;
         print('Time detection: ${endTime - startTime}');
+
+        // UI更新用に認識結果をセット
         if (recognitions != null && mounted) {
           state.recognitions = List<Recognition>.from(
               recognitions.map((model) => Recognition.fromJson(model)));
           state.widthImage = cameraImage.width;
           state.heightImage = cameraImage.height;
-          print('---- state -----:' + recognitions.toString());
           notifyListeners();
         }
         this._isDetecting = false;

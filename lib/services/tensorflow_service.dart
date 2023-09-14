@@ -26,6 +26,7 @@ class TensorFlowService {
   // 事前に定義された各ラベルのサイズの閾値
   // TODO: resource.dartに移動予定
   Map<String, List<dynamic>> predefinedObj = {
+    'car': ['車', Size(640, 360)],
     'person': ['人間', Size(640, 360)],
     'chair': ['椅子', Size(300, 150)],
     'keyboard': ['キーボード', Size(40, 70)],
@@ -90,7 +91,10 @@ class TensorFlowService {
     );
     // checkDetectedObjectSize(recognitions, image.width, image.height);
     print('runModelOnFrame2:' + recognitions.toString());
-
+    for (var obj in recognitions!) {
+      var label = obj['detectedClass'];
+      var confidence = obj['confidenceInClass'];
+    }
     return recognitions;
   }
 
@@ -146,7 +150,8 @@ class TensorFlowService {
       int imageHeight,
       Function noticeFunction,
       String targetKeyword,
-      CameraImage image) async {
+      CameraImage image,
+      num frameCount) async {
     var isGoal = false;
     for (var obj in recognitions!) {
       var label = obj['detectedClass'];

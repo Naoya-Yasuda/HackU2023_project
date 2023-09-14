@@ -1,4 +1,4 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/services.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'tts_notifier_service.dart';
@@ -202,7 +202,8 @@ class SpeechToTextService {
     if (!guideFrag) {
       return '';
     }
-    final apiKey = 'AIzaSyA-3ZfIrqxoICutfetO0GujoL5_Q0mW5OI';
+
+    String apiKey = await getAPIKey();
     var currentLocation = await getCurrentLocation();
     print('currentLocation:${currentLocation.toString()}');
     var userLocationParam = '${currentLocation[0]},${currentLocation[1]}';
@@ -370,5 +371,15 @@ class SpeechToTextService {
     } else {
       return "北西";
     }
+  }
+
+  Future<String> loadAsset() async {
+    return await rootBundle.loadString('assets/conf.json');
+  }
+
+  Future<String> getAPIKey() async {
+    String jsonString = await loadAsset();
+    final jsonResponse = json.decode(jsonString);
+    return jsonResponse['API_KEY'];
   }
 }
