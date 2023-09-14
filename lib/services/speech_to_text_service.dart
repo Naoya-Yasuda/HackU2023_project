@@ -12,6 +12,7 @@ import 'dart:math' as math;
 import 'audio_service.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:vibration/vibration.dart';
+import 'package:flutter_compass/flutter_compass.dart';
 
 class SpeechToTextService {
   final stt.SpeechToText _speech = stt.SpeechToText();
@@ -109,6 +110,12 @@ class SpeechToTextService {
       _speech.stop();
       _isListening = false;
     }
+  }
+
+  Future<String?> getCurrentDirection() async {
+    CompassEvent? direction;
+    direction = await FlutterCompass.events?.first;
+    return getDetailedDirectionName(direction);
   }
 
   String? getRecognizedText() {
@@ -284,6 +291,15 @@ class SpeechToTextService {
       print("ルート情報が見つかりませんでした。");
       _directions = "経路が見つかりませんでした";
     }
+
+    if (_directions.contains('北') ||
+        _directions.contains('東') ||
+        _directions.contains('南') ||
+        _directions.contains('西')) {
+      final userDirection = await getCurrentDirection();
+      print('$_directions現在は$userDirectionの方向を向いています');
+      _directions += ',,,,,,,,現在は$userDirectionの方向を向いています';
+    }
     return _directions;
   }
 
@@ -324,5 +340,35 @@ class SpeechToTextService {
   // 度数法からラジアンへの変換関数
   double _degreesToRadians(double degrees) {
     return degrees * math.pi / 180;
+  }
+
+  String getDetailedDirectionName(CompassEvent? event) {
+    double? heading = event?.heading;
+    if (heading == null) {
+      return '';
+    }
+    // 値を0〜360の範囲に正規化
+    if (heading < 0) {
+      heading = 360 + heading;
+    }
+
+    // 方角にマッピング
+    if (heading >= 337.5 || heading < 22.5) {
+      return "北";
+    } else if (heading >= 22.5 && heading < 67.5) {
+      return "北東";
+    } else if (heading >= 67.5 && heading < 112.5) {
+      return "東";
+    } else if (heading >= 112.5 && heading < 146.25) {
+      return "南南東";
+    } else if (heading >= 146.25 && heading < 202.5) {
+      return "南";
+    } else if (heading >= 202.5 && heading < 247.5) {
+      return "南西";
+    } else if (heading >= 247.5 && heading < 292.5) {
+      return "西";
+    } else {
+      return "北西";
+    }
   }
 }

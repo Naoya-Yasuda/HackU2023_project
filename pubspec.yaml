@@ -45,6 +45,7 @@ dependencies:
   permission_handler: ^8.2.2
   location: ^5.0.3
   html: ^0.15.4
+  flutter_compass: ^0.8.0
 
 dev_dependencies:
   flutter_test:
