@@ -63,10 +63,13 @@ class SpeechToTextService {
     print('--------- SpeechToTextService.startListening1:' +
         _isListening.toString());
     try {
-      if (!_isListening && _speech.isAvailable) {
+      if (!_isListening && _speech.isAvailable && !guideFrag) {
         print('--------- SpeechToTextService.startListening2:');
         _isListening = true;
         _speech.listen(onResult: _onResult, localeId: 'ja_JP');
+      } else if (guideFrag) {
+        // 路案内中の音声認識は無効、路案内をする
+        loadGuide();
       }
     } catch (e) {
       print('--------- SpeechToTextService.startListening3:' + e.toString());
