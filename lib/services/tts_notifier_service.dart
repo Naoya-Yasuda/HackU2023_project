@@ -25,8 +25,8 @@ class TTSNotifier {
     // }
   }
 
-  Future<bool> onObjectDetected(
-      dynamic object, String direction, String targetKeyword) async {
+  Future<bool> onObjectDetected(dynamic object, String direction,
+      String targetKeyword, String color) async {
     print('onObjectDetected start');
     final audioService = AudioService();
     var objJpLabel = object[0];
@@ -42,6 +42,13 @@ class TTSNotifier {
       message = "目標に到達しました。$objJpLabelが$directionの方向にあります。";
       duration = 3000;
       goalFlag = true;
+    } else if (color != '') {
+      if (color == '赤') {
+        message = "信号機が$directionの方向にあります。赤信号なので渡らないでください。";
+      } else {
+        message = "信号機が$directionの方向にあります。青信号なので渡ることができます。";
+      }
+      duration = 1000;
     } else {
       print('else onObjectDetected');
       if (objSize.width > 500 && objSize.height > 300) {

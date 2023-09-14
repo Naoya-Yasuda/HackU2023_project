@@ -29,6 +29,7 @@ class TensorFlowService {
     'person': ['人間', Size(640, 360)],
     'chair': ['椅子', Size(300, 150)],
     'keyboard': ['キーボード', Size(40, 70)],
+    'traffic light': ['信号機', Size(40, 70)],
     // 他のラベルとサイズを追加できます
   };
 
@@ -144,18 +145,27 @@ class TensorFlowService {
       int imageWidth,
       int imageHeight,
       Function noticeFunction,
-      String targetKeyword) async {
+      String targetKeyword,
+      CameraImage image) async {
     var isGoal = false;
     for (var obj in recognitions!) {
       var label = obj['detectedClass'];
+      var trafficLightColor = '';
+
       if (predefinedObj.containsKey(label)) {
+        if (label == 'traffic light') {
+          print('label == traffic light');
+          trafficLightColor = detectTrafficLightColor(image);
+        }
         print(
             '---------------checkDetectedObjectSize recognition: $obj.toString()');
         var predefinedSize = predefinedObj[label]?[1];
         var width = obj['rect']['w'] * imageWidth;
         var height = obj['rect']['h'] * imageHeight;
 
-        if (width > predefinedSize?.width || height > predefinedSize?.height) {
+        if (width > predefinedSize?.width ||
+            height > predefinedSize?.height ||
+            label == 'traffic light') {
           // 検知物体の方向を判定する
           double objectCenterX = obj['rect']['x'] + obj['rect']['w'] / 2;
           String direction;
@@ -166,12 +176,13 @@ class TensorFlowService {
           } else {
             direction = '目の前';
           }
-          var tempGaolFlag = await noticeFunction(
-              predefinedObj[label], direction, targetKeyword);
+          var tempGaolFlag = await noticeFunction(predefinedObj[label],
+              direction, targetKeyword, trafficLightColor);
           if (!isGoal && tempGaolFlag) {
             isGoal = true;
           }
         }
+        // }
       }
     }
     // 前回の結果と新しい結果を比較
@@ -185,5 +196,86 @@ class TensorFlowService {
     }
 
     return isGoal;
+  }
+
+  String detectTrafficLightColor(CameraImage cameraImage) {
+    img.Image image = convertYUV420ToImage(cameraImage);
+
+    // 1. 画像を2つの部分に分割
+    var topHalf = img.copyCrop(image, 0, 0, image.width, image.height ~/ 2);
+    var bottomHalf = img.copyCrop(
+        image, 0, image.height ~/ 2, image.width, image.height ~/ 2);
+
+    // 2. 各部分の平均色を取得
+    var topColor = getAverageColor(topHalf);
+    var bottomColor = getAverageColor(bottomHalf);
+
+    // 3. 平均色の明るさを比較
+    double topBrightness = 0.2126 * topColor.red +
+        0.7152 * topColor.green +
+        0.0722 * topColor.blue;
+    double bottomBrightness = 0.2126 * bottomColor.red +
+        0.7152 * bottomColor.green +
+        0.0722 * bottomColor.blue;
+
+    print("topBrightness" + topBrightness.toString());
+    print("bottomBrightness" + bottomBrightness.toString());
+
+    // 4. 色の判定
+    if (topBrightness > bottomBrightness) {
+      print("赤信号");
+      return "赤";
+    } else {
+      print("青信号");
+      return "青";
+    }
+  }
+
+  img.Image convertYUV420ToImage(CameraImage cameraImage) {
+    final int width = cameraImage.width;
+    final int height = cameraImage.height;
+    final int uvRowStride = cameraImage.planes[1].bytesPerRow;
+    final int uvPixelStride = cameraImage.planes[1].bytesPerPixel ?? 1;
+
+    final img.Image image = img.Image(width, height);
+
+    for (int y = 0; y < height; y++) {
+      for (int x = 0; x < width; x++) {
+        final int uvIndex =
+            uvPixelStride * (x / 2).floor() + uvRowStride * (y / 2).floor();
+        final int index = y * width + x;
+
+        final yp = cameraImage.planes[0].bytes[index];
+        final up = cameraImage.planes[1].bytes[uvIndex];
+        final vp = cameraImage.planes[2].bytes[uvIndex];
+
+        // Convert YUV to RGB
+        int r = (yp + vp * 1436 / 1024 - 179).round().clamp(0, 255);
+        int g = (yp - up * 46549 / 131072 + 44 - vp * 93604 / 131072 + 91)
+            .round()
+            .clamp(0, 255);
+        int b = (yp + up * 1814 / 1024 - 227).round().clamp(0, 255);
+
+        image.setPixelRgba(x, y, r, g, b);
+      }
+    }
+    return image;
+  }
+
+  Color getAverageColor(img.Image image) {
+    int redSum = 0, greenSum = 0, blueSum = 0;
+
+    for (int y = 0; y < image.height; y++) {
+      for (int x = 0; x < image.width; x++) {
+        int pixel = image.getPixel(x, y);
+        redSum += img.getRed(pixel);
+        greenSum += img.getGreen(pixel);
+        blueSum += img.getBlue(pixel);
+      }
+    }
+
+    int pixelCount = image.width * image.height;
+    return Color.fromRGBO(redSum ~/ pixelCount, greenSum ~/ pixelCount,
+        blueSum ~/ pixelCount, 1.0);
   }
 }
