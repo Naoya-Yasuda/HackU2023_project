@@ -85,7 +85,8 @@ class HomeViewModel extends BaseViewModel<HomeViewState> {
             cameraImage.width,
             cameraImage.height,
             noticeFunction,
-            target);
+            target,
+            cameraImage);
         print('After checkDetectedObjectSize');
         // 目標に到達したらtargetKeywordを初期化する
         if (isGoal) {
