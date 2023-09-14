@@ -17,7 +17,12 @@ class AppColors {
   static const Color white = Colors.white;
   static const Color blue = Colors.blue;
   static const Color grey = Colors.grey;
+  static const Color brown = Color.fromARGB(255, 128, 64, 0);
+  static const Color yellow = Color.fromARGB(255, 255, 241, 0);
+  static const Color beige = Color.fromARGB(255, 255, 202, 128);
 }
+
+mixin fromRGB {}
 
 class AppFonts {
   AppFonts._();
@@ -90,7 +95,7 @@ class AppImages {
 class AppStrings {
   AppStrings._();
 
-  static const title = '盲導犬アプリ';
+  static const title = 'ポチナビ';
   static const urlRepo =
       'https://github.com/hiennguyen92/flutter_realtime_object_detection';
 }

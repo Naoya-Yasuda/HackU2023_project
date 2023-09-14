@@ -131,22 +131,22 @@ class _HomeScreenState extends BaseStateful<HomeScreen, HomeViewModel>
             heroTag: null,
             onPressed: handleCaptureClick,
             tooltip: "Capture",
-            backgroundColor: AppColors.white,
+            backgroundColor: AppColors.beige,
             child: Icon(
               Icons.cut_outlined,
-              color: AppColors.blue,
+              color: AppColors.brown,
             ),
           ),
           FloatingActionButton(
             heroTag: null,
             onPressed: handleSwitchCameraClick,
             tooltip: "Switch Camera",
-            backgroundColor: AppColors.white,
+            backgroundColor: AppColors.beige,
             child: Icon(
               viewModel.state.isBackCamera()
                   ? Icons.camera_front
                   : Icons.camera_rear,
-              color: AppColors.blue,
+              color: AppColors.brown,
             ),
           ),
         ],
@@ -252,7 +252,7 @@ class _HomeScreenState extends BaseStateful<HomeScreen, HomeViewModel>
             icon: Icon(AppIcons.linkOption, semanticLabel: 'Repo')),
         PopupMenuButton<ModelType>(
             onSelected: (item) => handleSwitchSource(item),
-            color: AppColors.white,
+            color: AppColors.beige,
             itemBuilder: (context) => [
                   PopupMenuItem(
                       enabled: !viewModel.state.isYolo(),
@@ -320,11 +320,18 @@ class _HomeScreenState extends BaseStateful<HomeScreen, HomeViewModel>
                       value: ModelType.PoseNet),
                 ]),
       ],
-      backgroundColor: AppColors.blue,
+      backgroundColor: AppColors.brown,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          //ヘッダーの丸み
+          top: Radius.circular(MediaQuery.of(context).size.width * 0.05),
+          bottom: Radius.circular(MediaQuery.of(context).size.width * 0.05),
+        ),
+      ),
       title: Text(
         AppStrings.title,
         style: AppTextStyles.boldTextStyle(
-            color: AppColors.white, fontSize: AppFontSizes.large),
+            color: AppColors.beige, fontSize: AppFontSizes.large),
       ),
     );
   }
@@ -385,7 +392,7 @@ class _HomeScreenState extends BaseStateful<HomeScreen, HomeViewModel>
                                 } else {
                                   return const Center(
                                       child: CircularProgressIndicator(
-                                          color: AppColors.blue));
+                                          color: AppColors.brown));
                                 }
                               }),
                         ),
