@@ -19,6 +19,7 @@ class SpeechToTextService {
   bool _isListening = false;
   String _recognizedText = '';
   String _target = '';
+  bool goalFlag = false;
 
   SpeechToTextService(String targetKeyword) {
     _target = targetKeyword;
@@ -74,6 +75,7 @@ class SpeechToTextService {
   Future<void> startListening() async {
     print('--------- SpeechToTextService.startListening1:' +
         _isListening.toString());
+    _recognizedText = '';
     try {
       if (!_isListening && _speech.isAvailable && !guideFrag) {
         print('--------- SpeechToTextService.startListening2:');
@@ -82,7 +84,9 @@ class SpeechToTextService {
       } else if (guideFrag) {
         // 路案内中の音声認識は無効、路案内をする
         print('--------- SpeechToTextService.startListening3:');
-        loadGuide(tapFlag: true);
+        var _directions = await _guide();
+        print('---------tap _directions:' + _directions);
+        tTSNotifier.speak(_directions);
       }
     } catch (e) {
       print('--------- SpeechToTextService.startListening4:' + e.toString());
@@ -155,7 +159,7 @@ class SpeechToTextService {
       destination = match2.group(1)!; // 抜き出されたテキスト
       print('道案内のテキスト：$destination');
       await tTSNotifier.speak('$destinationまでの道案内を開始します。');
-      await Future.delayed(Duration(milliseconds: 2000)); // 1.5秒待機
+      // await Future.delayed(Duration(milliseconds: 1000)); // 待機
       loadGuide();
     }
     print('--------- _onResult4:');
@@ -171,108 +175,116 @@ class SpeechToTextService {
     print("Error in speech recognition: $error");
   }
 
-  Future<void> loadGuide({bool tapFlag = false}) async {
+  Future<void> loadGuide() async {
+    print('loadGuide start:');
+    var num = 0;
+    while (!goalFlag) {
+      print('loadGuide start:' + num.toString());
+      var _directions = await _guide();
+      print('loadGuide _directions:$_directions');
+      if (num == 0) {
+        tTSNotifier.speak(_directions);
+      }
+      await Future.delayed(Duration(seconds: 5));
+      num++;
+    }
+  }
+
+  Future<String> _guide() async {
+    print('_guide start:');
     if (!guideFrag) {
-      return;
+      return '';
     }
     final apiKey = 'AIzaSyA-3ZfIrqxoICutfetO0GujoL5_Q0mW5OI';
     var currentLocation = await getCurrentLocation();
     print('currentLocation:${currentLocation.toString()}');
     var userLocationParam = '${currentLocation[0]},${currentLocation[1]}';
-    var goalFlag = false;
     String _directions = '';
-    while (goalFlag) {
-      final result =
-          await fetchDirections(apiKey, userLocationParam, destination);
+    final result =
+        await fetchDirections(apiKey, userLocationParam, destination);
+    print('after fetchDirections:${result.toString()}');
 
-      String htmlDirections =
-          result['routes'][0]['legs'][0]['steps'][0]['html_instructions'];
-      _directions = convertHtmlToPlainText(htmlDirections);
-      // ルート情報を取得します
-      List<dynamic> routes = result['routes'];
-      if (routes != null && routes.isNotEmpty) {
-        // 最初のルートを取得します
-        Map<String, dynamic> route = routes[0];
+    String htmlDirections =
+        result['routes'][0]['legs'][0]['steps'][0]['html_instructions'];
+    _directions = convertHtmlToPlainText(htmlDirections);
+    // ルート情報を取得します
+    List<dynamic> routes = result['routes'];
+    if (routes != null && routes.isNotEmpty) {
+      // 最初のルートを取得します
+      Map<String, dynamic> route = routes[0];
 
-        // ルートのレッグ情報を取得します
-        List<dynamic> legs = route['legs'];
+      // ルートのレッグ情報を取得します
+      List<dynamic> legs = route['legs'];
 
-        if (legs != null && legs.isNotEmpty) {
-          // 最後のレッグを取得します
-          Map<String, dynamic> lastLeg = legs.last;
+      if (legs != null && legs.isNotEmpty) {
+        // 最後のレッグを取得します
+        Map<String, dynamic> lastLeg = legs.last;
 
-          // レッグのステップ情報を取得します
-          List<dynamic> steps = lastLeg['steps'];
+        // レッグのステップ情報を取得します
+        List<dynamic> steps = lastLeg['steps'];
 
-          if (steps != null && steps.isNotEmpty) {
-            // 最後のステップを取得します
-            Map<String, dynamic> lastStep = steps.last;
+        if (steps != null && steps.isNotEmpty) {
+          // 最後のステップを取得します
+          Map<String, dynamic> lastStep = steps.last;
 
-            // 最後のステップの終了地点情報を取得します
-            Map<String, dynamic> endLocation = lastStep['end_location'];
+          // 最後のステップの終了地点情報を取得します
+          Map<String, dynamic> endLocation = lastStep['end_location'];
 
-            if (endLocation != null) {
-              // 終了地点とユーザーの現在地が一致しているか確認します
-              double lat1 = endLocation['lat'];
-              double lng1 = endLocation['lng'];
-              double lat2 = currentLocation[0];
-              double lng2 = currentLocation[1];
+          if (endLocation != null) {
+            // 終了地点とユーザーの現在地が一致しているか確認します
+            double lat1 = endLocation['lat'];
+            double lng1 = endLocation['lng'];
+            double lat2 = currentLocation[0];
+            double lng2 = currentLocation[1];
 
-              // 緯度経度をラジアンに変換します
-              double dLat = _degreesToRadians(lat2 - lat1);
-              double dLng = _degreesToRadians(lng2 - lng1);
+            // 緯度経度をラジアンに変換します
+            double dLat = _degreesToRadians(lat2 - lat1);
+            double dLng = _degreesToRadians(lng2 - lng1);
 
-              // ハバーサイン公式を使用して2点間の距離を計算します
-              double a = math.sin(dLat / 2) * math.sin(dLat / 2) +
-                  math.cos(_degreesToRadians(lat1)) *
-                      math.cos(_degreesToRadians(lat2)) *
-                      math.sin(dLng / 2) *
-                      math.sin(dLng / 2);
-              double c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
-              // 地球の半径（メートル）
-              const double earthRadius = 6371000;
+            // ハバーサイン公式を使用して2点間の距離を計算します
+            double a = math.sin(dLat / 2) * math.sin(dLat / 2) +
+                math.cos(_degreesToRadians(lat1)) *
+                    math.cos(_degreesToRadians(lat2)) *
+                    math.sin(dLng / 2) *
+                    math.sin(dLng / 2);
+            double c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
+            // 地球の半径（メートル）
+            const double earthRadius = 6371000;
 
-              // 誤差許容範囲（メートル）
-              const double tolerance = 10;
-              double distance = earthRadius * c;
+            // 誤差許容範囲（メートル）
+            const double tolerance = 10;
+            double distance = earthRadius * c;
 
-              if (distance <= tolerance) {
-                //TODO:犬の鳴き声2回 バイブレーション
-                bool? hasVibrator = await Vibration.hasVibrator();
-                if (hasVibrator == true) {
-                  Vibration.vibrate();
-                  await Future.delayed(Duration(seconds: 1));
-                }
-                await playAssetSound('audios/dog2times.mp3');
-                await Future.delayed(Duration(seconds: 2));
-                _directions = "目的地$destinationに到着しました";
-                tTSNotifier.speak(_directions);
-                print("目的地に到着しました！$endLocation");
-                goalFlag = true;
-                guideFrag = false;
-                _timer?.cancel();
-              } else {
-                print("まだ目的地に到着していません。");
+            if (distance <= tolerance) {
+              bool? hasVibrator = await Vibration.hasVibrator();
+              if (hasVibrator == true) {
+                Vibration.vibrate();
+                await Future.delayed(Duration(seconds: 1));
               }
+              await playAssetSound('audios/dog2times.mp3');
+              await Future.delayed(Duration(seconds: 2));
+              _directions = "目的地$destinationに到着しました";
+              tTSNotifier.speak(_directions);
+              print("目的地に到着しました！$endLocation");
+              goalFlag = true;
+              guideFrag = false;
+              _timer?.cancel();
+              return '';
+            } else {
+              print("まだ目的地に到着していません。");
             }
-          } else {
-            print("ステップ情報が見つかりませんでした。");
           }
         } else {
-          print("レッグ情報が見つかりませんでした。");
+          print("ステップ情報が見つかりませんでした。");
         }
       } else {
-        print("ルート情報が見つかりませんでした。");
-        _directions = "経路が見つかりませんでした";
+        print("レッグ情報が見つかりませんでした。");
       }
-      if (tapFlag) {
-        tTSNotifier.speak(_directions);
-        return;
-      }
-      await Future.delayed(Duration(seconds: 5));
+    } else {
+      print("ルート情報が見つかりませんでした。");
+      _directions = "経路が見つかりませんでした";
     }
-
-    print('directions:$_directions');
+    return _directions;
   }
 
   Future<List<dynamic>> getCurrentLocation() async {

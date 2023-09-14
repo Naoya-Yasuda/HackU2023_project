@@ -18,8 +18,10 @@ class TTSNotifier {
 
   speak(String message) async {
     // if (!isCurrentlySpeaking) {
-    isCurrentlySpeaking = true;
-    await flutterTts.speak(message);
+    if (message != '') {
+      isCurrentlySpeaking = true;
+      await flutterTts.speak(message);
+    }
     // }
   }
 
