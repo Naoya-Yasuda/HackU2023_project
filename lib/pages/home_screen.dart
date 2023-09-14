@@ -353,10 +353,12 @@ class _HomeScreenState extends BaseStateful<HomeScreen, HomeViewModel>
     return GestureDetector(
       onPanDown: (details) {
         // タッチを開始したときの処理
+        print('画面タッチが開始された');
         viewModel.startListening();
       },
       onPanEnd: (details) {
         // タッチを終了したときの処理
+        print('画面タッチが終了された');
         viewModel.stopListening();
       },
       child: Container(

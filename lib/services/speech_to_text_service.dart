@@ -9,6 +9,9 @@ import 'package:html/parser.dart';
 import 'dart:convert';
 import 'dart:async';
 import 'dart:math' as math;
+import 'audio_service.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:vibration/vibration.dart';
 
 class SpeechToTextService {
   final stt.SpeechToText _speech = stt.SpeechToText();
@@ -34,6 +37,15 @@ class SpeechToTextService {
   String destination = '';
 
   bool guideFrag = false;
+
+  final audio = AudioService();
+
+  //犬の音声を流すメソッド
+  //TODO:このメソッドをaudio_service.dartに移動
+  Future<void> playAssetSound(String assetPath) async {
+    AudioCache cache = AudioCache();
+    await cache.play(assetPath);
+  }
 
   Future<void> initialize() async {
     print('initialize');
@@ -226,6 +238,12 @@ class SpeechToTextService {
 
             if (distance <= tolerance) {
               //TODO:犬の鳴き声2回 バイブレーション
+              //if (await Vibration.hasVibrator()) {
+              //Vibration.vibrate();
+              //}
+              await playAssetSound('audios/dog2times.mp3');
+              await Future.delayed(Duration(seconds: 2));
+              _directions = "目的地$destinationに到着しました";
               print("目的地に到着しました！$endLocation");
               goalFlag = true;
               guideFrag = false;
