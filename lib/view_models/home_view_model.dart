@@ -1,11 +1,11 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_realtime_object_detection/app/base/base_view_model.dart';
+import 'package:pochi_navi/app/base/base_view_model.dart';
 import '../services/tts_notifier_service.dart';
 import '/models/recognition.dart';
-import 'package:flutter_realtime_object_detection/services/tensorflow_service.dart';
-import 'package:flutter_realtime_object_detection/view_states/home_view_state.dart';
-import 'package:flutter_realtime_object_detection/services/speech_to_text_service.dart';
+import 'package:pochi_navi/services/tensorflow_service.dart';
+import 'package:pochi_navi/view_states/home_view_state.dart';
+import 'package:pochi_navi/services/speech_to_text_service.dart';
 
 class HomeViewModel extends BaseViewModel<HomeViewState> {
   bool _isDetecting = false;

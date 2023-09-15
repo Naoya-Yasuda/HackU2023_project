@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_realtime_object_detection/app/base/base_view_model.dart';
+import 'package:pochi_navi/app/base/base_view_model.dart';
 import 'package:provider/provider.dart';
 
 abstract class BaseStateful<T extends StatefulWidget, E extends BaseViewModel>

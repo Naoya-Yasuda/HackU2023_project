@@ -18,19 +18,17 @@ class TensorFlowService {
   Future<Map<String, dynamic>> loadPredefinedObj() async {
     final jsonString = await rootBundle.loadString('assets/data.json');
     print(jsonString);
-    return json.decode(jsonString);
+    return json.decode(jsonString)['predefinedObj'];
   }
 
   Future<void> initialize() async {
     predefinedObj = await loadPredefinedObj();
+    print('predefinedObj:' + predefinedObj.toString());
   }
 
   set type(type) {
     _type = type;
   }
-
-  // 事前に定義された各ラベルのサイズの閾値
-  // TODO: resource.dartに移動予定
 
   loadModel(ModelType type) async {
     try {
@@ -178,13 +176,15 @@ class TensorFlowService {
               trafficLightColor = detectTrafficLightColor(image);
             }
             print(
-                '---------------checkDetectedObjectSize recognition: $lastObj.toString()');
+                '---------------checkDetectedObjectSize recognition: $lastObj');
+            print(
+                '---------------checkDetectedObjectSize recognition2: ${predefinedObj![label].toString()}');
             var predefinedSize = predefinedObj![label]?[1];
             var width = lastObj['rect']['w'] * imageWidth;
             var height = lastObj['rect']['h'] * imageHeight;
 
-            if (width > predefinedSize?.width ||
-                height > predefinedSize?.height ||
+            if (width > predefinedSize?["width"] ||
+                height > predefinedSize?["height"] ||
                 label == 'traffic light') {
               // 検知物体の方向を判定する
               double objectCenterX =

@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_realtime_object_detection/widgets/aperture/aperture_leaf_painter.dart';
+import 'package:pochi_navi/widgets/aperture/aperture_leaf_painter.dart';
 
 class ApertureLeaf extends StatefulWidget {
   final double borderWidth;

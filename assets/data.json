@@ -2,28 +2,38 @@
     "predefinedObj": {
         "car": [
             "車",
-            640,
-            360
+            {
+                "width": 640,
+                "height": 360
+            }
         ],
         "person": [
             "人間",
-            640,
-            360
+            {
+                "width": 640,
+                "height": 360
+            }
         ],
         "chair": [
             "椅子",
-            300,
-            150
+            {
+                "width": 300,
+                "height": 150
+            }
         ],
         "keyboard": [
             "キーボード",
-            40,
-            70
+            {
+                "width": 40,
+                "height": 70
+            }
         ],
         "traffic light": [
             "信号機",
-            40,
-            70
+            {
+                "width": 15,
+                "height": 30
+            }
         ]
     }
-} 
+}

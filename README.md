@@ -1,10 +1,10 @@
-# Flutter realtime object detection with Tensorflow Lite
+# Flutter pochi navi with Tensorflow Lite
 
-Flutter realtime object detection with Tensorflow Lite
+Flutter pochi navi with Tensorflow Lite
 
 ## Info
 
-An app made with Flutter and TensorFlow Lite for realtime object detection using model YOLO, SSD, MobileNet, PoseNet.
+An app made with Flutter and TensorFlow Lite for pochi navi using model YOLO, SSD, MobileNet, PoseNet.
 
 
 
@@ -62,9 +62,9 @@ minSdkVersion 21
 loadModel() async {
     Tflite.close();
     await Tflite.loadModel(
-        model: "assets/models/yolov2_tiny.tflite",  
+        model: "assets/models/yolov2_tiny.tflite",
         //ssd_mobilenet.tflite, mobilenet_v1.tflite, posenet_mv1_checkpoints.tflite
-        labels: "assets/models/yolov2_tiny.txt",    
+        labels: "assets/models/yolov2_tiny.txt",
         //ssd_mobilenet.txt, mobilenet_v1.txt
         //numThreads: 1, // defaults to 1
         //isAsset: true, // defaults: true, set to false to load resources outside assets
@@ -90,7 +90,7 @@ For Realtime Camera
           imageStd: 255.0,              // defaults to 127.5
           threshold: 0.2,               // defaults to 0.1
           numResultsPerClass: 1,
-        );   
+        );
     return recognitions;
   }
 
@@ -107,7 +107,7 @@ For Realtime Camera
           imageStd: 127.5,
           threshold: 0.4,
           numResultsPerClass: 1,
-        );   
+        );
     return recognitions;
   }
 
@@ -120,7 +120,7 @@ For Realtime Camera
           imageHeight: image.height,
           imageWidth: image.width,
           numResults: 5
-        );   
+        );
     return recognitions;
   }
 
@@ -133,7 +133,7 @@ For Realtime Camera
           imageHeight: image.height,
           imageWidth: image.width,
           numResults: 5
-        );   
+        );
     return recognitions;
   }
 ```
@@ -208,26 +208,4 @@ run pod install in your /ios folder
 6. Source code
 
 ```
-please checkout repo github
-https://github.com/hiennguyen92/flutter_realtime_object_detection
-```
-  * <a href='https://github.com/hiennguyen92/flutter_realtime_object_detection'>https://github.com/hiennguyen92/flutter_realtime_object_detection</a>
-## :bulb: Demo
-
-1. Demo Illustration: https://www.youtube.com/watch?v=__i7PRmz5kY&ab_channel=HienNguyen
-2. Image
-<table>
-  <tr>
-    <td><img src="https://raw.githubusercontent.com/hiennguyen92/flutter_realtime_object_detection/main/images/image1.jpg" width="250"></td>
-    <td><img src="https://raw.githubusercontent.com/hiennguyen92/flutter_realtime_object_detection/main/images/image2.jpg" width="250"></td>
-  </tr>
-  <tr>
-    <td><img src="https://raw.githubusercontent.com/hiennguyen92/flutter_realtime_object_detection/main/images/image3.jpg" width="250"></td>
-    <td><img src="https://raw.githubusercontent.com/hiennguyen92/flutter_realtime_object_detection/main/images/image4.jpg" width="250"></td>
-  </tr>
-  <tr>
-    <td><img src="https://raw.githubusercontent.com/hiennguyen92/flutter_realtime_object_detection/main/images/image5.jpg" width="250"></td>
-    <td><img src="https://raw.githubusercontent.com/hiennguyen92/flutter_realtime_object_detection/main/images/image6.jpg" width="250"></td>
-  </tr>
- </table>
 

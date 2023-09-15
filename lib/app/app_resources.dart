@@ -96,6 +96,5 @@ class AppStrings {
   AppStrings._();
 
   static const title = 'ポチナビ';
-  static const urlRepo =
-      'https://github.com/hiennguyen92/flutter_realtime_object_detection';
+  static const urlRepo = 'https://github.com/Naoya-Yasuda/HackU2023_project';
 }

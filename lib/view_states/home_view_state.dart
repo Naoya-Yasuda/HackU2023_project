@@ -1,10 +1,8 @@
-
-import 'package:flutter_realtime_object_detection/services/tensorflow_service.dart';
+import 'package:pochi_navi/services/tensorflow_service.dart';
 
 import '/models/recognition.dart';
 
 class HomeViewState {
-
   ModelType type;
 
   late List<Recognition> recognitions = <Recognition>[];
@@ -12,7 +10,6 @@ class HomeViewState {
   int widthImage = 0;
 
   int heightImage = 0;
-
 
   int cameraIndex = 0;
 
@@ -41,5 +38,4 @@ class HomeViewState {
   bool isPoseNet() {
     return type == ModelType.PoseNet;
   }
-  
 }

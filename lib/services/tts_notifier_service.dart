@@ -49,10 +49,10 @@ class TTSNotifier {
       duration = 1000;
     } else {
       print('else onObjectDetected');
-      if (objSize.width > 500 && objSize.height > 300) {
+      if (objSize["width"] > 500 && objSize["height"] > 300) {
         message = "危険です。$objJpLabelが$directionの方向にあります。避けて下さい。";
         duration = 5000;
-      } else if (objSize.width >= 300 && objSize.height >= 150) {
+      } else if (objSize["width"] >= 300 && objSize["height"] >= 150) {
         message = "$objJpLabelが$directionの方向にあります。気を付けて下さい。";
         duration = 3000;
       } else {

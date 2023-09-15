@@ -1,18 +1,14 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_realtime_object_detection/widgets/aperture/aperture_leaf.dart';
-
-
+import 'package:pochi_navi/widgets/aperture/aperture_leaf.dart';
 
 class ApertureWidget extends StatefulWidget {
-
   final StreamController apertureController;
 
   final Widget? child;
 
   ApertureWidget({required this.apertureController, this.child});
-
 
   @override
   State<StatefulWidget> createState() {
@@ -30,25 +26,24 @@ class _ApertureWidgetState extends State<ApertureWidget>
   @override
   void initState() {
     super.initState();
-    streamSubscription = widget.apertureController.stream.asBroadcastStream().listen((event) {
+    streamSubscription =
+        widget.apertureController.stream.asBroadcastStream().listen((event) {
       print(event);
       animationController.forward();
     });
 
-    animationController = AnimationController(
-        vsync: this, duration: Duration(milliseconds: 500));
+    animationController =
+        AnimationController(vsync: this, duration: Duration(milliseconds: 500));
 
     animationController.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
         Future.delayed(const Duration(milliseconds: 800), () {
           animationController.reverse();
         });
-      } else if (status == AnimationStatus.dismissed) {
-      }
+      } else if (status == AnimationStatus.dismissed) {}
     });
     animationController.forward();
   }
-
 
   @override
   void dispose() {

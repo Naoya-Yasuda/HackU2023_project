@@ -1,10 +1,10 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_realtime_object_detection/app/app_resources.dart';
-import 'package:flutter_realtime_object_detection/app/base/base_stateful.dart';
-import 'package:flutter_realtime_object_detection/services/tensorflow_service.dart';
-import 'package:flutter_realtime_object_detection/view_models/local_view_model.dart';
+import 'package:pochi_navi/app/app_resources.dart';
+import 'package:pochi_navi/app/base/base_stateful.dart';
+import 'package:pochi_navi/services/tensorflow_service.dart';
+import 'package:pochi_navi/view_models/local_view_model.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -54,7 +54,6 @@ class _LocalScreenState extends BaseStateful<LocalScreen, LocalViewModel> {
     }
     viewModel.updateImageSelected(File(_imageFile.path));
 
-
     new FileImage(viewModel.state.imageSelected!)
         .resolve(new ImageConfiguration())
         .addListener(ImageStreamListener((ImageInfo info, bool _) {
@@ -63,7 +62,6 @@ class _LocalScreenState extends BaseStateful<LocalScreen, LocalViewModel> {
         _imageWidth = info.image.width.toDouble();
       });
     }));
-
 
     runModel(viewModel.state.imageSelected!);
   }
@@ -101,8 +99,7 @@ class _LocalScreenState extends BaseStateful<LocalScreen, LocalViewModel> {
         extendBodyBehindAppBar: false,
         appBar: buildAppBarWidget(context),
         body: buildBodyWidget(context),
-        floatingActionButton: buildFloatingActionButton(context)
-    );
+        floatingActionButton: buildFloatingActionButton(context));
   }
 
   Widget buildFloatingActionButton(BuildContext context) {
@@ -129,7 +126,6 @@ class _LocalScreenState extends BaseStateful<LocalScreen, LocalViewModel> {
       return viewModel.isLoading ? loadingWidget() : contentWidget();
     });
   }
-
 
   List<Widget> renderBoxes(Size screen) {
     if (_imageHeight == 0 || _imageWidth == 0) return [];
@@ -174,18 +170,17 @@ class _LocalScreenState extends BaseStateful<LocalScreen, LocalViewModel> {
           color: AppColors.blue.withOpacity(0.4),
           border: Border.all(color: AppColors.blue, width: 2)),
       child: Padding(
-        padding: const EdgeInsets.all(0),
-        child: Stack(
-          children: [
-            Positioned(
-                top: 0.0,
-                left: 0.0,
-                width: MediaQuery.of(context).size.width,
-                child: Image.file(viewModel.state.imageSelected!)),
-            ...stackChildren
-          ],
-        )
-      ),
+          padding: const EdgeInsets.all(0),
+          child: Stack(
+            children: [
+              Positioned(
+                  top: 0.0,
+                  left: 0.0,
+                  width: MediaQuery.of(context).size.width,
+                  child: Image.file(viewModel.state.imageSelected!)),
+              ...stackChildren
+            ],
+          )),
     );
   }
 }

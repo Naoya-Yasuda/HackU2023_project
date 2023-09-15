@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter_realtime_object_detection/app/app_resources.dart';
-import 'package:flutter_realtime_object_detection/app/app_router.dart';
-import 'package:flutter_realtime_object_detection/services/navigation_service.dart';
+import 'package:pochi_navi/app/app_resources.dart';
+import 'package:pochi_navi/app/app_router.dart';
+import 'package:pochi_navi/services/navigation_service.dart';
 import 'package:provider/provider.dart';
 
 class SplashScreen extends StatefulWidget {
