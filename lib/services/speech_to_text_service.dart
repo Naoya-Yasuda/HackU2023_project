@@ -13,14 +13,22 @@ import 'audio_service.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:vibration/vibration.dart';
 import 'package:flutter_compass/flutter_compass.dart';
+import 'dart:convert';
+import 'package:flutter/services.dart';
 
 class SpeechToTextService {
   final stt.SpeechToText _speech = stt.SpeechToText();
+
+  Future<Map<String, dynamic>> loadData() async {
+    final jsonString = await rootBundle.loadString('assets/data.json');
+    return json.decode(jsonString);
+  }
 
   bool _isListening = false;
   String _recognizedText = '';
   String _target = '';
   bool goalFlag = false;
+  List<String>? supportedKeywords = [];
 
   SpeechToTextService(String targetKeyword) {
     _target = targetKeyword;
@@ -51,6 +59,11 @@ class SpeechToTextService {
 
   Future<void> initialize() async {
     print('initialize');
+    final data = await loadData();
+    for (var key in data['predefinedObj'].keys) {
+      supportedKeywords!.add(data['predefinedObj'][key][0]);
+    }
+    print('==============initializeValue' + supportedKeywords.toString());
     bool hasPermission = await _requestMicrophonePermission();
     if (!hasPermission) {
       print("Microphone permission was not granted");
@@ -139,19 +152,13 @@ class SpeechToTextService {
     final Match? match = pattern.firstMatch(_recognizedText!);
     final RegExp pattern2 = RegExp(r'(.+?)まで案内して');
     final Match? match2 = pattern2.firstMatch(_recognizedText!);
-    final supportedKeywords = [
-      '椅子',
-      '人間',
-      '人',
-      'キーボード',
-    ];
 
     if (match != null && match.groupCount > 0) {
       String extractedText = match.group(1)!; // 抜き出されたテキスト
       print('--------- _onResult2:' + extractedText);
 
       // 抜き出されたテキストの中に、supportedKeywordsのキーワードが含まれているか確認
-      for (var keyword in supportedKeywords) {
+      for (var keyword in supportedKeywords!) {
         if (extractedText.contains(keyword)) {
           print('--------- _onResult3:' + keyword);
           final message = '$keywordを探します';
