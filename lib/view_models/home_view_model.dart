@@ -27,6 +27,7 @@ class HomeViewModel extends BaseViewModel<HomeViewState> {
       notifyListeners(); // UIの更新
     };
     _initializeSpeech();
+    _tensorFlowService.initialize();
   }
 
   void _initializeSpeech() async {

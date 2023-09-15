@@ -3,6 +3,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/services.dart';
 import 'package:tflite/tflite.dart';
 import 'package:image/image.dart' as img;
+import 'dart:convert';
 
 enum ModelType { YOLO, SSDMobileNet, MobileNet, PoseNet }
 
@@ -12,6 +13,17 @@ class TensorFlowService {
   ModelType get type => _type;
   Map<String, List<dynamic>> recognitions10times = {};
   num frameCount = 0;
+  Map<String, dynamic>? predefinedObj;
+
+  Future<Map<String, dynamic>> loadPredefinedObj() async {
+    final jsonString = await rootBundle.loadString('assets/data.json');
+    print(jsonString);
+    return json.decode(jsonString);
+  }
+
+  Future<void> initialize() async {
+    predefinedObj = await loadPredefinedObj();
+  }
 
   set type(type) {
     _type = type;
@@ -19,14 +31,6 @@ class TensorFlowService {
 
   // 事前に定義された各ラベルのサイズの閾値
   // TODO: resource.dartに移動予定
-  Map<String, List<dynamic>> predefinedObj = {
-    'car': ['車', Size(640, 360)],
-    'person': ['人間', Size(640, 360)],
-    'chair': ['椅子', Size(300, 150)],
-    'keyboard': ['キーボード', Size(40, 70)],
-    'traffic light': ['信号機', Size(40, 70)],
-    // 他のラベルとサイズを追加できます
-  };
 
   loadModel(ModelType type) async {
     try {
@@ -168,14 +172,14 @@ class TensorFlowService {
           // 一番新しい物体情報を取得
           var lastObj = list.last;
           var trafficLightColor = '';
-          if (predefinedObj.containsKey(label)) {
+          if (predefinedObj!.containsKey(label)) {
             if (label == 'traffic light') {
               print('label == traffic light');
               trafficLightColor = detectTrafficLightColor(image);
             }
             print(
                 '---------------checkDetectedObjectSize recognition: $lastObj.toString()');
-            var predefinedSize = predefinedObj[label]?[1];
+            var predefinedSize = predefinedObj![label]?[1];
             var width = lastObj['rect']['w'] * imageWidth;
             var height = lastObj['rect']['h'] * imageHeight;
 
@@ -194,7 +198,7 @@ class TensorFlowService {
                 direction = '目の前';
               }
               // 目標到達の場合はフラグを立てる
-              isGoal = !await noticeFunction(predefinedObj[label], direction,
+              isGoal = !await noticeFunction(predefinedObj![label], direction,
                   targetKeyword, trafficLightColor);
             }
           }
